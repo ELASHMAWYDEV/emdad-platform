@@ -44,4 +44,25 @@ router.post("/vendor/transportationOffers/:transportationOfferId/pay", tempRespo
 router.get("/vendor/transportationOffers/paymentStatus/success", tempResponse);
 router.get("/vendor/transportationOffers/paymentStatus/failure", tempResponse);
 
+//Supplier
+router.get("/supplier/supplyRequests", tempResponse);
+router.post("/supplier/supplyOffers", tempResponse);
+router.post("/supplier/transportationRequests", tempResponse);
+router.get("/supplier/transportationOffers", tempResponse);
+router.get("/supplier/transportationOffers/:transportationOfferId", tempResponse);
+router.post("/supplier/transportationOffers/:transportationOfferId/accept", tempResponse);
+router.post("/supplier/transportationOffers/:transportationOfferId/pay", tempResponse);
+router.get("/supplier/transportationOffers/paymentStatus/success", tempResponse);
+router.get("/supplier/transportationOffers/paymentStatus/failure", tempResponse);
+router.post("/supplier/products", tempResponse);
+router.get("/supplier/products", tempResponse);
+router.get("/supplier/products/:productId", tempResponse);
+router.post("/supplier/products/:productId", tempResponse);
+
+//Transporter
+router.get("/transporter/transportationRequests", tempResponse);
+router.get("/transporter/transportationRequests/:transportationRequestId", tempResponse);
+router.post("/transporter/transportationRequests/:transportationRequestId/changeStatus", tempResponse);
+router.post("/transporter/transportationOffers", tempResponse);
+
 export default router;
