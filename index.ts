@@ -15,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
+
 // API
 app.use("/api/mobile", mobileRoutes);
 app.use("/api/dashboard", dashboardRoutes);
