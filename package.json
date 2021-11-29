@@ -7,7 +7,7 @@
   "scripts": {
     "start": "ts-node index.ts",
     "dev": "nodemon index.ts",
-    "build": "tsc && netlify-lambda build express"
+    "build": "tsc && netlify-lambda build dist"
   },
   "keywords": [],
   "author": "ELASHMAWYDEV",
