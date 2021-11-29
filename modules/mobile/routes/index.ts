@@ -21,7 +21,7 @@ router.get("/vendor/suppliers/:supplierId", tempResponse);
 router.get("/vendor/suppliers/:supplierId/products", tempResponse);
 router.get("/vendor/suppliers/:supplierId/products/:productId", tempResponse);
 
-router.post("/vendor/supplyRequests", tempResponse);
+router.put("/vendor/supplyRequests", tempResponse);
 router.post("/vendor/supplyRequests/:supplyRequestId/resend", tempResponse);
 router.post("/vendor/supplyRequests/:supplyRequestId/rate", tempResponse);
 router.get("/vendor/supplyRequests", tempResponse);
@@ -33,7 +33,7 @@ router.post("/vendor/supplyOffers/:supplyOfferId/pay", tempResponse);
 router.get("/vendor/supplyOffers/paymentStatus/success", tempResponse);
 router.get("/vendor/supplyOffers/paymentStatus/failure", tempResponse);
 
-router.post("/vendor/transportationRequests", tempResponse);
+router.put("/vendor/transportationRequests", tempResponse);
 router.get("/vendor/transportationRequests", tempResponse);
 router.get("/vendor/transportationRequests/:transportationRequestId", tempResponse);
 router.post("/vendor/transportationRequests/:transportationRequestId/resend", tempResponse);
@@ -46,7 +46,9 @@ router.get("/vendor/transportationOffers/paymentStatus/failure", tempResponse);
 
 //Supplier
 router.get("/supplier/supplyRequests", tempResponse);
+
 router.post("/supplier/supplyOffers", tempResponse);
+
 router.post("/supplier/transportationRequests", tempResponse);
 router.get("/supplier/transportationOffers", tempResponse);
 router.get("/supplier/transportationOffers/:transportationOfferId", tempResponse);
@@ -54,6 +56,7 @@ router.post("/supplier/transportationOffers/:transportationOfferId/accept", temp
 router.post("/supplier/transportationOffers/:transportationOfferId/pay", tempResponse);
 router.get("/supplier/transportationOffers/paymentStatus/success", tempResponse);
 router.get("/supplier/transportationOffers/paymentStatus/failure", tempResponse);
+
 router.post("/supplier/products", tempResponse);
 router.get("/supplier/products", tempResponse);
 router.get("/supplier/products/:productId", tempResponse);
