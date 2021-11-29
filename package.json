@@ -7,7 +7,9 @@
   "scripts": {
     "start": "ts-node index.ts",
     "dev": "nodemon index.ts",
-    "build": "tsc && netlify-lambda build dist"
+    "build": "rm -rf **/dist && tsc && netlify-lambda build dist",
+    "start-netlify": "netlify-lambda serve dist"
+
   },
   "keywords": [],
   "author": "ELASHMAWYDEV",

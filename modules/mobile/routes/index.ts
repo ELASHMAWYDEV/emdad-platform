@@ -1,13 +1,18 @@
 import express from "express";
 const router = express.Router();
 
+//Controllers
+import { login, register } from "../controllers/authentication";
+
 const tempResponse = (req, res) => res.send("Not Working Yet");
 
-// Authentication & Profile
-router.post("/auth/login", tempResponse);
-router.post("/auth/register", tempResponse);
+// Authentication
+router.post("/auth/login", login);
+router.post("/auth/register", register);
 router.post("/auth/otp/phone", tempResponse);
 router.post("/auth/otp/email", tempResponse);
+
+// Profile
 router.post("/profile/complete", tempResponse);
 router.post("/profile/edit", tempResponse);
 router.post("/profile/editPassword", tempResponse);

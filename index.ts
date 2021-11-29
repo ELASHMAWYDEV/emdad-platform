@@ -15,13 +15,18 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-
 // API
 app.use("/api/mobile", mobileRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/", (req, res) => {
   return res.send("Working Fine!");
+});
+
+app.use((err, req, res, next) => {
+  if (err) {
+    return res.json({ status: false, message: err.message });
+  }
 });
 
 /*********************************************************/
