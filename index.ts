@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import serverless from "serverless-http";
 const PORT = process.env.PORT || 5000;
 const app = express();
 import dashboardRoutes from "./modules/dashboard/routes";
@@ -33,4 +32,3 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
 
-module.exports.handler = serverless(app);
