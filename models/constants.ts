@@ -11,4 +11,9 @@ const supportedLanguages: Constant = {
   EN: "en",
 };
 
-export { userTypes, supportedLanguages };
+const countryCodes: Constant = {
+  SA: "+966",
+  EG: "+20",
+};
+
+export { userTypes, supportedLanguages, countryCodes };

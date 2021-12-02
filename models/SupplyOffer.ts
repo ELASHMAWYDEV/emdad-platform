@@ -46,4 +46,4 @@ const SupplyOfferSchema = new Schema({
   },
 });
 
-module.exports = model("SupplyOffer", SupplyOfferSchema, "supplyOffers");
+export default  model("SupplyOffer", SupplyOfferSchema, "supplyOffers");

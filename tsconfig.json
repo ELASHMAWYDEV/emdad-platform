@@ -5,7 +5,7 @@
     "rootDir": "./",
     "baseUrl": ".",
     "declaration": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "outDir": "dist",
     "importHelpers": true,
     "esModuleInterop": true,
@@ -18,8 +18,11 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "moduleResolution": "node",
     "noEmit": true,
-    "allowJs": true
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "*": ["*"]
+    }
   },
-  "include": ["."],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }

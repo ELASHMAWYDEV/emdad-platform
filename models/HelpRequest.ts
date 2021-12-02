@@ -42,4 +42,4 @@ const HelpRequestSchema = new Schema({
   },
 });
 
-module.exports = model("HelpRequest", HelpRequestSchema, "transportationMethods");
+export default  model("HelpRequest", HelpRequestSchema, "transportationMethods");

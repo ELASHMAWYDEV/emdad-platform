@@ -57,4 +57,4 @@ const SupplyRequestSchema = new Schema({
   },
 });
 
-module.exports = model("SupplyRequest", SupplyRequestSchema, "supplyRequests");
+export default  model("SupplyRequest", SupplyRequestSchema, "supplyRequests");

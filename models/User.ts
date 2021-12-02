@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { userTypes, supportedLanguages } from "models/constants";
+import { userTypes, supportedLanguages,countryCodes } from "./constants";
 
 const pointSchema = new Schema({
   type: {
@@ -28,11 +28,17 @@ const UserSchema = new Schema({
     required: true,
   },
   primaryPhoneNumber: {
-    type: String,
+    type: {
+      countryCode: Object.values(countryCodes),
+      number: String,
+    },
     required: true,
   },
   secondaryPhoneNumber: {
-    type: String,
+    type: {
+      countryCode: Object.values(countryCodes),
+      number: String,
+    },
   },
   primaryEmail: {
     type: String,
@@ -78,4 +84,4 @@ function isSupplierTypeRequired(this: { type: StringConstructor; required: () =>
   return this.userType == userTypes.SUPPLIER;
 }
 
-module.exports = model("User", UserSchema, "users");
+export default model("User", UserSchema, "users");

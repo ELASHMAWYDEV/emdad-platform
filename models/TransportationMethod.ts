@@ -12,4 +12,4 @@ const TransportationMethodSchema = new Schema({
   },
 });
 
-module.exports = model("TransportationMethod", TransportationMethodSchema, "transportationMethods");
+export default  model("TransportationMethod", TransportationMethodSchema, "transportationMethods");

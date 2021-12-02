@@ -39,4 +39,4 @@ const TransportationOfferSchema = new Schema({
   },
 });
 
-module.exports = model("TransportationOffer", TransportationOfferSchema, "transportationOffers");
+export default  model("TransportationOffer", TransportationOfferSchema, "transportationOffers");

@@ -1,5 +1,5 @@
 import { Schema, model, Types } from "mongoose";
-import { supportedLanguages } from "models/constants";
+import { supportedLanguages } from "./constants";
 
 const ProductSchema = new Schema({
   name: {
@@ -58,4 +58,4 @@ const ProductSchema = new Schema({
   },
 });
 
-module.exports = model("Product", ProductSchema, "products");
+export default  model("Product", ProductSchema, "products");

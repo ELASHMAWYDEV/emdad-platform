@@ -41,4 +41,4 @@ const SupplierRatingSchema = new Schema({
   },
 });
 
-module.exports = model("SupplierRating", SupplierRatingSchema, "supplierRatings");
+export default  model("SupplierRating", SupplierRatingSchema, "supplierRatings");

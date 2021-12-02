@@ -41,4 +41,4 @@ const ProductRatingSchema = new Schema({
   },
 });
 
-module.exports = model("ProductRating", ProductRatingSchema, "productRatings");
+export default  model("ProductRating", ProductRatingSchema, "productRatings");
