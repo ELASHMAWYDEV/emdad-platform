@@ -1,4 +1,8 @@
-import { Schema, model, Types } from "mongoose";
+const {
+  Schema,
+  model,
+  Types
+} = require("mongoose");
 
 const TransportationMethodSchema = new Schema({
   name: {
@@ -12,4 +16,4 @@ const TransportationMethodSchema = new Schema({
   },
 });
 
-export default  model("TransportationMethod", TransportationMethodSchema, "transportationMethods");
+module.exports = model("TransportationMethod", TransportationMethodSchema, "transportationMethods");

@@ -28,4 +28,7 @@ const errors = Object.freeze({
   },
 });
 
-export { errorCodes, errors };
+module.exports = {
+  errorCodes,
+  errors
+};

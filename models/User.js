@@ -1,5 +1,12 @@
-import { Schema, model } from "mongoose";
-import { userTypes, supportedLanguages,countryCodes } from "./constants";
+const {
+  Schema,
+  model
+} = require("mongoose");
+const {
+  userTypes,
+  supportedLanguages,
+  countryCodes
+} = require("./constants");
 
 const pointSchema = new Schema({
   type: {
@@ -16,7 +23,13 @@ const pointSchema = new Schema({
 
 const UserSchema = new Schema({
   name: {
-    type: Object.values(supportedLanguages).reduce((a, c) => ({ ...a, [c]: { type: String, required: true } }), {}), // All languages are required
+    type: Object.values(supportedLanguages).reduce((a, c) => ({
+      ...a,
+      [c]: {
+        type: String,
+        required: true
+      }
+    }), {}), // All languages are required
     required: true,
   },
   username: {
@@ -53,7 +66,10 @@ const UserSchema = new Schema({
     enum: Object.values(userTypes),
   },
   oraganizationName: {
-    type: Object.values(supportedLanguages).reduce((a, c) => ({ ...a, [c]: String }), {}),
+    type: Object.values(supportedLanguages).reduce((a, c) => ({
+      ...a,
+      [c]: String
+    }), {}),
     required: true,
   },
   commercialRegister: {
@@ -80,8 +96,8 @@ const UserSchema = new Schema({
   },
 });
 
-function isSupplierTypeRequired(this: { type: StringConstructor; required: () => boolean; userType: string }) {
+function isSupplierTypeRequired() {
   return this.userType == userTypes.SUPPLIER;
 }
 
-export default model("User", UserSchema, "users");
+module.exports = model("User", UserSchema, "users");

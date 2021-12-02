@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
-import UserModel from "../models/User";
+const jwt = require("jsonwebtoken");
+const UserModel = require("../models/User");
 
 const createToken = async (payload) => {
   try {
@@ -18,18 +18,26 @@ const checkToken = async (req, res, next) => {
       (req.cookies && req.cookies["access_token"]);
 
     if (!token) {
-      return res.json({ status: false, message: "You must login first" });
+      return res.json({
+        status: false,
+        message: "You must login first"
+      });
     }
 
     const user = await jwt.verify(token, process.env.ACCESS_TOKEN || "randomaccesstoken");
 
     //check DB existence
-    const searchUser = await UserModel.findOne({ _id: user._id });
+    const searchUser = await UserModel.findOne({
+      _id: user._id
+    });
     if (searchUser) {
       req.user = searchUser;
       return next();
     } else {
-      return res.json({ status: false, message: "You must login first" });
+      return res.json({
+        status: false,
+        message: "You must login first"
+      });
     }
   } catch (e) {
     console.log(e);
@@ -37,4 +45,7 @@ const checkToken = async (req, res, next) => {
   }
 };
 
-export { createToken, checkToken };
+module.exports = {
+  createToken,
+  checkToken
+};

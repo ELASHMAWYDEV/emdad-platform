@@ -1,4 +1,8 @@
-import { Schema, model, Types } from "mongoose";
+const {
+  Schema,
+  model,
+  Types
+} = require("mongoose");
 
 const SupplierRatingSchema = new Schema({
   traderId: {
@@ -41,4 +45,4 @@ const SupplierRatingSchema = new Schema({
   },
 });
 
-export default  model("SupplierRating", SupplierRatingSchema, "supplierRatings");
+module.exports = model("SupplierRating", SupplierRatingSchema, "supplierRatings");

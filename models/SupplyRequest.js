@@ -1,4 +1,8 @@
-import { Schema, model, Types } from "mongoose";
+const {
+  Schema,
+  model,
+  Types
+} = require("mongoose");
 
 const pointSchema = new Schema({
   type: {
@@ -57,4 +61,4 @@ const SupplyRequestSchema = new Schema({
   },
 });
 
-export default  model("SupplyRequest", SupplyRequestSchema, "supplyRequests");
+module.exports = model("SupplyRequest", SupplyRequestSchema, "supplyRequests");

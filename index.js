@@ -1,16 +1,17 @@
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const PORT = process.env.PORT || 5000;
 const app = express();
-import dashboardRoutes from "./modules/dashboard/routes";
-import mobileRoutes from "./modules/mobile/routes";
-import ApiError from "./errors/ApiError";
-import AjvError from "./errors/AjvError";
-import { errorCodes } from "./errors";
+const dashboardRoutes = require("./modules/dashboard/routes");
+const mobileRoutes = require("./modules/mobile/routes");
+const ApiError = require("./errors/ApiError");
+const {
+  errorCodes
+} = require("./errors");
 
 // Init
-import "./init";
+require("./init");
 
 //Middlewares
 app.use(cors());
@@ -25,7 +26,7 @@ app.get("/", (req, res) => {
   return res.send("Working Fine!");
 });
 
-const sendErrorResponse = (res, err: ApiError) => {
+const sendErrorResponse = (res, err) => {
   return res.status(err.statusCode || 500).json({
     status: false,
     message: err.message,
@@ -34,7 +35,7 @@ const sendErrorResponse = (res, err: ApiError) => {
   });
 };
 
-app.use((err: ApiError | AjvError, req, res, next) => {
+app.use((err, req, res, next) => {
   if (err instanceof ApiError) {
     return sendErrorResponse(res, new ApiError(err.errorCode, err.details));
   } else {

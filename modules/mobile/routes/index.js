@@ -1,8 +1,11 @@
-import express from "express";
+const express = require("express");
 const router = express.Router();
 
 //Controllers
-import { login, register } from "../controllers/authentication";
+const {
+  login,
+  register
+} = require("../controllers/authentication");
 
 const tempResponse = (req, res) => res.send("Not Working Yet");
 
@@ -73,4 +76,4 @@ router.get("/transporter/transportationRequests/:transportationRequestId", tempR
 router.post("/transporter/transportationRequests/:transportationRequestId/changeStatus", tempResponse);
 router.post("/transporter/transportationOffers", tempResponse);
 
-export default router;
+module.exports = router;

@@ -1,27 +1,32 @@
-import { Schema, model, Types } from "mongoose";
+const {
+  Schema,
+  model,
+  Types
+} = require("mongoose");
 
-const ProductRatingSchema = new Schema({
-  traderId: {
+const HelpRequestSchema = new Schema({
+  fromUserId: {
     type: Types.ObjectId,
     ref: "User",
     required: true,
   },
-  productId: {
+  toUserId: {
     type: Types.ObjectId,
-    ref: "Product",
+    ref: "User",
     required: true,
   },
-  rating: {
-    type: Number,
-    max: 5,
-    min: 0,
-  },
-  comment: {
+  question: {
     type: String,
   },
-  isActive: {
-    type: Boolean,
-    default: true,
+  questionDate: {
+    type: Date,
+    default: Date.now,
+  },
+  answer: {
+    type: String,
+  },
+  answerDate: {
+    type: Date,
   },
   creationDate: {
     type: Date,
@@ -41,4 +46,4 @@ const ProductRatingSchema = new Schema({
   },
 });
 
-export default  model("ProductRating", ProductRatingSchema, "productRatings");
+module.exports = model("HelpRequest", HelpRequestSchema, "transportationMethods");
