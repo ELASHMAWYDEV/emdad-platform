@@ -1,8 +1,4 @@
-const {
-  Schema,
-  model,
-  Types
-} = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 
 const TransportationMethodSchema = new Schema({
   name: {

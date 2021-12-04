@@ -1,11 +1,23 @@
-const { loginUser, registerNewUser } = require( "../../services/authentication");
+const {
+  loginUser,
+  registerNewUser,
+  verifyOneTimePass
+} = require("../../services/authentication");
 
 const login = async (req, res, next) => {
   try {
-    const { username, password } = req.body;
+    const {
+      username,
+      password
+    } = req.body;
 
-    const result = await loginUser({ username, password });
-    res.cookie("access_token", result.accessToken, { maxAge: 86400 * 1000 });
+    const result = await loginUser({
+      username,
+      password
+    });
+    res.cookie("access_token", result.accessToken, {
+      maxAge: 86400 * 1000
+    });
     res.cookie("user_data", JSON.stringify(result.user), {
       maxAge: 86400 * 1000,
     });
@@ -23,17 +35,8 @@ const login = async (req, res, next) => {
 
 const register = async (req, res, next) => {
   try {
-    const { name, username, password, primaryPhoneNumber, secondaryPhoneNumber, primaryEmail, secondaryEmail } =
-      req.body;
-    const result = await registerNewUser({
-      name,
-      username,
-      password,
-      primaryPhoneNumber,
-      secondaryPhoneNumber,
-      primaryEmail,
-      secondaryEmail,
-    });
+    const user = req.body;
+    const result = await registerNewUser(user);
 
     return res.json({
       status: true,
@@ -46,4 +49,31 @@ const register = async (req, res, next) => {
   }
 };
 
-module.exports ={ login, register };
+
+const verifyOtp = async (req, res, next) => {
+  try {
+    const {
+      otp,
+      type
+    } = req.body;
+    await verifyOneTimePass({
+      userId: req.user._id,
+      otp,
+      type
+    });
+
+    return res.json({
+      status: true,
+      message: `تم تأكيد ${type == "phone" ? "رقم هاتفك" : "بريدك الالكتروني"} بنجاح`,
+      data: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+module.exports = {
+  login,
+  register,
+  verifyOtp
+};

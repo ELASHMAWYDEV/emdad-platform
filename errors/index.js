@@ -7,6 +7,10 @@ const errorCodes = Object.freeze({
   EMPTY_FIELD: "EMPTY_FIELD",
   WRONG_LOGIN_CREDENTIALS: "WRONG_LOGIN_CREDENTIALS",
   VALIDATION_ERROR: "VALIDATION_ERROR",
+  DUPLICATION_ERROR: "DUPLICATION_ERROR",
+  USER_HAS_NO_PHONE: "USER_HAS_NO_PHONE",
+  USER_HAS_NO_EMAIL: "USER_HAS_NO_EMAIL",
+  OTP_INCORRECT: "OTP_INCORRECT",
 });
 
 const errors = Object.freeze({
@@ -25,6 +29,22 @@ const errors = Object.freeze({
   [errorCodes.VALIDATION_ERROR]: {
     status: statuses.OK,
     message: "بعض الحقول التي ارسلتها بها مشاكل ، يرجي اعادة المحاولة",
+  },
+  [errorCodes.DUPLICATION_ERROR]: {
+    status: statuses.OK,
+    message: "هذه البيانات مسجلة من قبل",
+  },
+  [errorCodes.USER_HAS_NO_PHONE]: {
+    status: statuses.OK,
+    message: "ليس لديك اي ارقام جوال مسجلة لدينا",
+  },
+  [errorCodes.USER_HAS_NO_EMAIL]: {
+    status: statuses.OK,
+    message: "ليس لديك اي ايميلات مسجلة لدينا",
+  },
+  [errorCodes.OTP_INCORRECT]: {
+    status: statuses.OK,
+    message: "الرقم الذي ادخلته غير صحيح",
   },
 });
 

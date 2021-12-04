@@ -23,18 +23,20 @@ const pointSchema = new Schema({
 
 const UserSchema = new Schema({
   name: {
-    type: Object.values(supportedLanguages).reduce((a, c) => ({
-      ...a,
-      [c]: {
-        type: String,
-        required: true
-      }
-    }), {}), // All languages are required
+    // type: Object.values(supportedLanguages).reduce((a, c) => ({
+    //   ...a,
+    //   [c]: {
+    //     type: String,
+    //     required: true
+    //   }
+    // }), {}), // All languages are required
+    type: String,
     required: true,
   },
   username: {
     type: String,
     required: true,
+    unique: true
   },
   password: {
     type: String,
@@ -42,27 +44,44 @@ const UserSchema = new Schema({
   },
   primaryPhoneNumber: {
     type: {
-      countryCode: Object.values(countryCodes),
-      number: String,
+      countryCode: {
+        type: String,
+        enum: Object.values(countryCodes),
+        required: true
+      },
+      number: {
+        type: String,
+        required: true
+      },
     },
     required: true,
+    unique: true
   },
   secondaryPhoneNumber: {
     type: {
-      countryCode: Object.values(countryCodes),
-      number: String,
+      countryCode: {
+        type: String,
+        enum: Object.values(countryCodes),
+        required: true
+      },
+      number: {
+        type: String,
+        required: true
+      },
     },
+    unique: true
   },
   primaryEmail: {
     type: String,
     required: true,
+    unique: true
   },
   secondaryEmail: {
     type: String,
+    unique: true
   },
   userType: {
     type: String,
-    required: true,
     enum: Object.values(userTypes),
   },
   oraganizationName: {
@@ -70,7 +89,7 @@ const UserSchema = new Schema({
       ...a,
       [c]: String
     }), {}),
-    required: true,
+    required: isUserTypeSpecified,
   },
   commercialRegister: {
     type: String,
@@ -98,6 +117,10 @@ const UserSchema = new Schema({
 
 function isSupplierTypeRequired() {
   return this.userType == userTypes.SUPPLIER;
+}
+
+function isUserTypeSpecified() {
+  return !!this.userType;
 }
 
 module.exports = model("User", UserSchema, "users");

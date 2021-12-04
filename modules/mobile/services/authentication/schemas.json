@@ -13,5 +13,90 @@
         "type": "string"
       }
     }
+  },
+  "registrationSchema": {
+    "type": "object",
+    "required": [
+      "name",
+      "username",
+      "password",
+      "primaryPhoneNumber",
+      "primaryEmail"
+    ],
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "username": {
+        "type": "string"
+      },
+      "password": {
+        "type": "string",
+        "minLength": 6,
+        "format": "password"
+      },
+      "primaryPhoneNumber": {
+        "type": "object",
+        "required": [
+          "countryCode",
+          "number"
+        ],
+        "properties": {
+          "countryCode": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          }
+        }
+      },
+      "secondaryPhoneNumber": {
+        "type": "object",
+        "nullable": true,
+        "required": [
+          "countryCode",
+          "number"
+        ],
+        "properties": {
+          "countryCode": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          }
+        }
+      },
+      "primaryEmail": {
+        "type": "string",
+        "format": "email"
+      },
+      "secondaryEmail": {
+        "type": "string",
+        "nullable": true,
+        "format": "email"
+      }
+    }
+  },
+  "verifyOtpSchema": {
+    "type": "object",
+    "required": [
+      "otp",
+      "type"
+    ],
+    "properties": {
+      "otp": {
+        "type": [
+          "string",
+          "number"
+        ]
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "phone",
+          "email"
+        ]
+      }
+    }
   }
 }

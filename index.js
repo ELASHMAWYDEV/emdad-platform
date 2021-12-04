@@ -11,7 +11,9 @@ const {
 } = require("./errors");
 
 // Init
+require("./globals");
 require("./init");
+
 
 //Middlewares
 app.use(cors());
@@ -36,8 +38,17 @@ const sendErrorResponse = (res, err) => {
 };
 
 app.use((err, req, res, next) => {
+  console.error(err);
   if (err instanceof ApiError) {
+    // API Error
     return sendErrorResponse(res, new ApiError(err.errorCode, err.details));
+
+  } else if (err.code == 11000) {
+    // Duplication Error 
+    return sendErrorResponse(res, new ApiError(errorCodes.DUPLICATION_ERROR, [{
+      key: Object.keys(err.keyValue)[0],
+      message: "هذا الحقل مسجل لدينا مسبقا ولا يمكن تسجيله مرة أخري"
+    }]));
   } else {
     return sendErrorResponse(res, new ApiError(errorCodes.UNKOWN_ERROR, undefined));
   }

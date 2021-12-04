@@ -1,7 +1,4 @@
-const {
-  Schema,
-  model
-} = require("mongoose");
+const { Schema, model } = require("mongoose");
 
 const SettingsSchema = new Schema({}); // TODO: what settings would be here ?
 

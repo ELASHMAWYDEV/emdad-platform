@@ -1,19 +1,24 @@
 const express = require("express");
 const router = express.Router();
+const {
+  checkToken
+} = require("../../../middlewares/jwt");
 
 //Controllers
 const {
   login,
-  register
+  register,
+  verifyOtp
 } = require("../controllers/authentication");
+
+
 
 const tempResponse = (req, res) => res.send("Not Working Yet");
 
 // Authentication
 router.post("/auth/login", login);
 router.post("/auth/register", register);
-router.post("/auth/otp/phone", tempResponse);
-router.post("/auth/otp/email", tempResponse);
+router.post("/auth/otp", checkToken, verifyOtp);
 
 // Profile
 router.post("/profile/complete", tempResponse);

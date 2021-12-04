@@ -1,6 +1,7 @@
 const Ajv = require("ajv");
 const AjvError = require("../errors/AjvError");
 const localize = require("ajv-i18n");
+const addFormat = require("ajv-formats");
 const {
   supportedLanguages
 } = require("../models/constants");
@@ -9,6 +10,7 @@ const ajv = new Ajv({
   allErrors: true,
   messages: false
 });
+addFormat(ajv);
 
 const validateSchema =
   (schema, lang = supportedLanguages.AR) =>

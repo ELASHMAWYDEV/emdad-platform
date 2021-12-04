@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "ajv": "^8.8.2",
+    "ajv-formats": "^2.1.1",
     "ajv-i18n": "^4.2.0",
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
@@ -19,7 +20,8 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.0.13"
+    "mongoose": "^6.0.13",
+    "twilio": "^3.71.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
