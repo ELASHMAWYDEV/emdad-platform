@@ -23,13 +23,6 @@ const pointSchema = new Schema({
 
 const UserSchema = new Schema({
   name: {
-    // type: Object.values(supportedLanguages).reduce((a, c) => ({
-    //   ...a,
-    //   [c]: {
-    //     type: String,
-    //     required: true
-    //   }
-    // }), {}), // All languages are required
     type: String,
     required: true,
   },
@@ -93,8 +86,9 @@ const UserSchema = new Schema({
   },
   commercialRegister: {
     type: String,
+    unique: true
   },
-  transportationMethorDescription: {
+  transportationMethodDescription: {
     type: String,
   },
   location: {
@@ -113,6 +107,9 @@ const UserSchema = new Schema({
     type: String,
     required: isSupplierTypeRequired, // TODO: what are the supplier types ?
   },
+  firebaseToken: {
+    type: String,
+  }
 });
 
 function isSupplierTypeRequired() {

@@ -1,10 +1,15 @@
-const { errorCodes } = require("./");
+const {
+  errorCodes
+} = require("./");
 const ApiError = require("./ApiError");
 
 class AjvError extends ApiError {
   constructor(errors) {
-    const details = errors.map(({ params, message }) => ({
-      key: params.missingProperty,
+    const details = errors.map(({
+      params,
+      message
+    }) => ({
+      key: params.missingProperty || params.additionalProperty,
       message,
     }));
     super(errorCodes.VALIDATION_ERROR, details);

@@ -1,34 +1,36 @@
-const { Schema, model, Types } = require("mongoose");
-const { supportedLanguages } = require("./constants");
+const {
+  Schema,
+  model,
+  Types
+} = require("mongoose");
+const {
+  supportedLanguages
+} = require("./constants");
 
 const ProductSchema = new Schema({
   name: {
-    type: Object.values(supportedLanguages).reduce((a, c) => ({ ...a, [c]: { type: String, required: true } }), {}), // All languages are required
-    required: true,
+    type: String,
+    required: true
   },
   description: {
-    type: Object.values(supportedLanguages).reduce((a, c) => ({ ...a, [c]: { type: String, required: true } }), {}), // All languages are required
-    required: true,
-  },
-  productType: {
-    type: String,
-    required: true, // TODO: what are the product types ?
-  },
-  productUnit: {
     type: String,
     required: true,
   },
-  price: {
-    type: {
-      beforeTax: Number,
-      afterTax: Number,
-    },
-  },
-  tax: {
-    type: {
-      percantage: Number,
-      value: Number,
-    },
+  // productType: {
+  //   type: String,
+  //   required: true, // TODO: what are the product types ?
+  // },
+  units: {
+    type: [{
+      productUnit: {
+        type: String,
+        required: true,
+      },
+      pricePerUnit: {
+        type: Number,
+        required: true
+      },
+    }]
   },
   isPriceShown: {
     type: Boolean,
@@ -36,6 +38,7 @@ const ProductSchema = new Schema({
   },
   images: {
     type: [String],
+    required: true
   },
   notes: {
     type: String,
@@ -51,11 +54,7 @@ const ProductSchema = new Schema({
   },
   modificationDate: {
     type: Date,
-  },
-  modifiedBy: {
-    type: Types.ObjectId,
-    ref: "User",
-  },
+  }
 });
 
 module.exports = model("Product", ProductSchema, "products");

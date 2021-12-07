@@ -1,0 +1,144 @@
+{
+  "completeProfileSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "_id",
+      "userType",
+      "oraganizationName",
+      "commercialRegister",
+      "location"
+    ],
+    "properties": {
+      "_id": {
+        "type": "object"
+      },
+      "userType": {
+        "type": "string",
+        "enum": [
+          "supplier",
+          "trader",
+          "transporter"
+        ]
+      },
+      "oraganizationName": {
+        "type": "object",
+        "required": [
+          "ar",
+          "en"
+        ],
+        "properties": {
+          "ar": {
+            "type": "string"
+          },
+          "en": {
+            "type": "string"
+          }
+        }
+      },
+      "commercialRegister": {
+        "type": "string"
+      },
+      "location": {
+        "type": "object",
+        "required": [
+          "lat",
+          "lng"
+        ],
+        "properties": {
+          "lat": {
+            "type": "number"
+          },
+          "lng": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  },
+  "editProfileSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "_id"
+    ],
+    "properties": {
+      "_id": {
+        "type": "object"
+      },
+      "oraganizationName": {
+        "type": "object",
+        "required": [
+          "ar",
+          "en"
+        ],
+        "properties": {
+          "ar": {
+            "type": "string"
+          },
+          "en": {
+            "type": "string"
+          }
+        }
+      },
+      "commercialRegister": {
+        "type": "string"
+      },
+      "location": {
+        "type": "object",
+        "required": [
+          "lat",
+          "lng"
+        ],
+        "properties": {
+          "lat": {
+            "type": "number"
+          },
+          "lng": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  },
+  "editPasswordSchema": {
+    "type": "object",
+    "required": [
+      "_id",
+      "oldPassword",
+      "newPassword",
+      "newPasswordConfirm"
+    ],
+    "properties": {
+      "_id": {
+        "type": "object"
+      },
+      "oldPassword": {
+        "type": "string"
+      },
+      "newPassword": {
+        "type": "string",
+        "minLength": 6
+      },
+      "confirmPassword": {
+        "type": "string"
+      }
+    }
+  },
+  "editEmailSchema": {
+    "type": "object",
+    "required": [
+      "_id",
+      "email"
+    ],
+    "properties": {
+      "_id": {
+        "type": "object"
+      },
+      "email": {
+        "type": "string",
+        "format": "email"
+      }
+    }
+  }
+}

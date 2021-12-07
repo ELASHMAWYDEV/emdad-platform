@@ -1,5 +1,12 @@
 require("dotenv/config");
 const mongoose = require("mongoose");
+const admin = require("firebase-admin");
+const serviceAccount = require("./emdad-platform-firebase-adminsdk-dl79r-d6899b8abe.json");
+
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 
 

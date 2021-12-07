@@ -11,6 +11,9 @@ const errorCodes = Object.freeze({
   USER_HAS_NO_PHONE: "USER_HAS_NO_PHONE",
   USER_HAS_NO_EMAIL: "USER_HAS_NO_EMAIL",
   OTP_INCORRECT: "OTP_INCORRECT",
+  PROFILE_ALREADY_COMPLETED: "PROFILE_ALREADY_COMPLETED",
+  OLD_PASSWORD_INCORRECT: "OLD_PASSWORD_INCORRECT",
+  PASSWORD_NOT_MATCH: "PASSWORD_NOT_MATCH",
 });
 
 const errors = Object.freeze({
@@ -45,6 +48,18 @@ const errors = Object.freeze({
   [errorCodes.OTP_INCORRECT]: {
     status: statuses.OK,
     message: "الرقم الذي ادخلته غير صحيح",
+  },
+  [errorCodes.PROFILE_ALREADY_COMPLETED]: {
+    status: statuses.OK,
+    message: "لقد اكملت الملف الشخصي من قبل ، قم بتسجيل الدخول مرة أخري",
+  },
+  [errorCodes.OLD_PASSWORD_INCORRECT]: {
+    status: statuses.OK,
+    message: "كلمة المرور القديمة غير صحيحة",
+  },
+  [errorCodes.PASSWORD_NOT_MATCH]: {
+    status: statuses.OK,
+    message: "كلمة المرور الجديدة وتأكيدها غير متطابقين",
   },
 });
 
