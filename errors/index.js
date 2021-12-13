@@ -14,6 +14,8 @@ const errorCodes = Object.freeze({
   PROFILE_ALREADY_COMPLETED: "PROFILE_ALREADY_COMPLETED",
   OLD_PASSWORD_INCORRECT: "OLD_PASSWORD_INCORRECT",
   PASSWORD_NOT_MATCH: "PASSWORD_NOT_MATCH",
+  NO_SUPPLIERS_FOUND: "NO_SUPPLIERS_FOUND",
+  NO_SETTINGS_FOUND: "NO_SETTINGS_FOUND",
 });
 
 const errors = Object.freeze({
@@ -60,6 +62,14 @@ const errors = Object.freeze({
   [errorCodes.PASSWORD_NOT_MATCH]: {
     status: statuses.OK,
     message: "كلمة المرور الجديدة وتأكيدها غير متطابقين",
+  },
+  [errorCodes.NO_SUPPLIERS_FOUND]: {
+    status: statuses.OK,
+    message: "لا يوجد موردين",
+  },
+  [errorCodes.NO_SETTINGS_FOUND]: {
+    status: statuses.OK,
+    message: "لا يوجد اعدادات في المنصة ، يرجي التواصل مع الدعم الفني",
   },
 });
 

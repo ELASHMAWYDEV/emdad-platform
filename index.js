@@ -38,6 +38,7 @@ const sendErrorResponse = (res, err) => {
 };
 
 app.use((err, req, res, next) => {
+  console.log(err.errorCode, err);
   if (err instanceof ApiError) {
     // API Error
     return sendErrorResponse(res, new ApiError(err.errorCode, err.details));

@@ -1,12 +1,16 @@
-const { Schema, model, Types } = require("mongoose");
+const {
+  Schema,
+  model,
+  Types
+} = require("mongoose");
 
-const SupplierRatingSchema = new Schema({
-  traderId: {
+const VendorRatingSchema = new Schema({
+  userId: {
     type: Types.ObjectId,
     ref: "User",
     required: true,
   },
-  supplierId: {
+  vendorId: {
     type: Types.ObjectId,
     ref: "User",
     required: true,
@@ -41,4 +45,4 @@ const SupplierRatingSchema = new Schema({
   },
 });
 
-module.exports = model("SupplierRating", SupplierRatingSchema, "supplierRatings");
+module.exports = model("VendorRating", VendorRatingSchema, "vendorRatings");

@@ -1,6 +1,6 @@
 const userTypes = {
-  SUPPLIER: "supplier",
-  TRADER: "trader",
+  USER: "user",
+  VENDOR: "vendor",
   TRANSPORTER: "transporter",
 };
 
@@ -14,8 +14,15 @@ const countryCodes = {
   EG: "+20",
 };
 
+const settingsKeys = {
+  MOBILE: "mobileSettings",
+  FEATURED_VENDORS: "featuredVendors"
+}
+
+
 module.exports = {
   userTypes,
   supportedLanguages,
-  countryCodes
+  countryCodes,
+  settingsKeys
 };

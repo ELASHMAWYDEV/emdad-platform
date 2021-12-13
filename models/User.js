@@ -4,7 +4,6 @@ const {
 } = require("mongoose");
 const {
   userTypes,
-  supportedLanguages,
   countryCodes
 } = require("./constants");
 
@@ -25,6 +24,11 @@ const UserSchema = new Schema({
   name: {
     type: String,
     required: true,
+  },
+  isVerified: {
+    type: Boolean,
+    required: true,
+    default: false
   },
   username: {
     type: String,
@@ -78,15 +82,13 @@ const UserSchema = new Schema({
     enum: Object.values(userTypes),
   },
   oraganizationName: {
-    type: Object.values(supportedLanguages).reduce((a, c) => ({
-      ...a,
-      [c]: String
-    }), {}),
+    type: String,
     required: isUserTypeSpecified,
   },
   commercialRegister: {
     type: String,
-    unique: true
+    unique: true,
+    required: isUserTypeSpecified
   },
   transportationMethodDescription: {
     type: String,
@@ -94,6 +96,7 @@ const UserSchema = new Schema({
   location: {
     type: pointSchema,
     index: "2dsphere",
+    required: isUserTypeSpecified
   },
   creationDate: {
     type: Date,
@@ -103,17 +106,27 @@ const UserSchema = new Schema({
     type: Date,
     default: null,
   },
-  supplierType: {
-    type: String,
-    required: isSupplierTypeRequired, // TODO: what are the supplier types ?
+
+  vendorType: {
+    type: [String],
+    required: isVendorTypeRequired,
   },
   firebaseToken: {
     type: String,
+  },
+  country: {
+    type: String,
+    enum: Object.keys(countryCodes),
+    required: isUserTypeSpecified
+  },
+  city: {
+    type: String,
+    required: isUserTypeSpecified
   }
 });
 
-function isSupplierTypeRequired() {
-  return this.userType == userTypes.SUPPLIER;
+function isVendorTypeRequired() {
+  return this.userType == userTypes.VENDOR;
 }
 
 function isUserTypeSpecified() {

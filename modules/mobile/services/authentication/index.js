@@ -1,8 +1,13 @@
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 const {
   TWILIO_SID,
   TWILIO_TOKEN,
-  TWILIO_SERVICE_ID
+  TWILIO_SERVICE_ID,
+  SMTP_HOST,
+  SMTP_PORT,
+  SMTP_USER,
+  SMTP_PASS,
 } = require("../../../../globals");
 const twilioClient = require("twilio")(TWILIO_SID, TWILIO_TOKEN);
 const {
@@ -97,22 +102,44 @@ const sendOtp = async (userId) => {
     }])
 
   } else {
-    phoneOtp = unverifiedOtps.find(e => e.type == "phone");
-    emailOtp = unverifiedOtps.find(e => e.type == "email");
+    phoneOtp = unverifiedOtps.find(e => e.type == "phone").otp;
+    emailOtp = unverifiedOtps.find(e => e.type == "email").otp;
   }
 
-
-
-  if (phoneOtp) {
-    await twilioClient.messages.create({
-      body: `Your OTP is: ${phoneOtp}`,
-      messagingServiceSid: TWILIO_SERVICE_ID,
-      to: `${primaryPhoneNumber.countryCode}${primaryPhoneNumber.number.slice(1)}`
-    });
-  }
+  // if (phoneOtp) {
+  //   await twilioClient.messages.create({
+  //     body: `Your OTP is: ${phoneOtp}`,
+  //     messagingServiceSid: TWILIO_SERVICE_ID,
+  //     to: `${primaryPhoneNumber.countryCode}${primaryPhoneNumber.number.slice(1)}`
+  //   });
+  // }
 
   if (emailOtp) {
-    // @TODO: send email to the user with the OTP 
+    let transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: parseInt(SMTP_PORT),
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS
+      }
+    });
+
+    transporter.sendMail({
+      from: "no-reply@emdad.com",
+      to: primaryEmail,
+      priority: "high",
+      subject: "Emdad: Verify your Email",
+      html: `
+      <body>
+        <div style="padding: 40px 10px;">
+          <h1 style="text-align:center; padding: 20px 10px;width: 100%; background-color: #34495e; color: #fff;">Verify Your Email</h1>
+          <div style="width:100%; padding: 70px 10px; background-color: #ecf0f1;">
+            <p style="font-size: 22px; text-align:center; color:#2c3e50;">Your OTP is: <strong>${emailOtp}</strong></p>
+          </div>
+        </div>
+      </body>
+      `
+    })
   }
 }
 
@@ -144,13 +171,27 @@ const verifyOneTimePass = validateSchema(schemas.verifyOtpSchema)(async ({
       isVerified: true
     }
   });
+
+
+  //Check if there are no more otps & verify the user
+  if (!await OtpModel.findOne({
+      userId
+    }))
+    await UserModel.updateOne({
+      _id: userId
+    }, {
+      $set: {
+        isVerified: true
+      }
+    });
 })
 
 /*******************************************/
 
 const loginUser = validateSchema(schemas.loginSchema)(async ({
   username,
-  password
+  password,
+  firebaseToken
 }) => {
   let userObject = await UserModel.findOne({
     username,
@@ -163,14 +204,53 @@ const loginUser = validateSchema(schemas.loginSchema)(async ({
     throw new ApiError(errorCodes.WRONG_LOGIN_CREDENTIALS);
   }
 
+  //Update firebase token
+  await UserModel.updateOne({
+    username
+  }, {
+    $set: {
+      firebaseToken
+    }
+  });
+
   //Send the jwt token with the success response
   const accessToken = await createToken({
     _id: userObject._id,
+    userType: userObject.userType
   });
 
+  //Check for OTP
+  if (userObject.isVerified == false) {
+    await sendOtp(userObject._id);
+    return {
+      status: true,
+      message: "يجب عليك تأكيد هاتفك وبريدك الالكتروني",
+      data: {
+        accessToken,
+        step: "verification"
+      }
+    }
+  }
+
+  //Check for profile completion
+  if (!userObject.userType) {
+    return {
+      status: true,
+      message: "يجب عليك اكمال بياناتك أولا",
+      data: {
+        accessToken,
+        step: "profile"
+      }
+    }
+  }
+
+
+
+
+
   return {
-    user: userObject,
     accessToken,
+    user: userObject,
   };
 });
 

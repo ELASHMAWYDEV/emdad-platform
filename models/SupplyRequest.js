@@ -18,21 +18,21 @@ const pointSchema = new Schema({
 });
 
 const SupplyRequestSchema = new Schema({
-  traderId: {
+  userId: {
     type: Types.ObjectId,
     ref: "User",
     required: true,
   },
-  supplierId: {
+  vendorId: {
     type: Types.ObjectId,
     ref: "User",
   }, //Assigned after the offer is accepted
-  traderLocation: {
+  userLocation: {
     type: pointSchema,
     index: "2dsphere",
     required: true,
   },
-  traderLocationDescription: {
+  userLocationDescription: {
     type: String,
     required: true,
   },

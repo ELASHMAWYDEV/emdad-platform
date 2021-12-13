@@ -11,6 +11,9 @@
       },
       "password": {
         "type": "string"
+      },
+      "firebaseToken": {
+        "type": "string"
       }
     }
   },
@@ -74,6 +77,9 @@
         "type": "string",
         "nullable": true,
         "format": "email"
+      },
+      "firebaseToken": {
+        "type": "string"
       }
     }
   },

@@ -7,7 +7,9 @@
       "userType",
       "oraganizationName",
       "commercialRegister",
-      "location"
+      "location",
+      "country",
+      "city"
     ],
     "properties": {
       "_id": {
@@ -16,25 +18,31 @@
       "userType": {
         "type": "string",
         "enum": [
-          "supplier",
-          "trader",
+          "vendor",
+          "user",
           "transporter"
         ]
       },
-      "oraganizationName": {
-        "type": "object",
-        "required": [
-          "ar",
-          "en"
-        ],
-        "properties": {
-          "ar": {
-            "type": "string"
-          },
-          "en": {
+      "vendorType": {
+        "type": "array",
+        "items": [
+          {
             "type": "string"
           }
-        }
+        ]
+      },
+      "city": {
+        "type": "string"
+      },
+      "country": {
+        "type": "string",
+        "enum": [
+          "SA",
+          "EG"
+        ]
+      },
+      "oraganizationName": {
+        "type": "string"
       },
       "commercialRegister": {
         "type": "string"

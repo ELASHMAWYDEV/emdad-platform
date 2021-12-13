@@ -15,6 +15,13 @@ const login = async (req, res, next) => {
       username,
       password
     });
+
+
+    //Verification & Profile completion steps
+    if (result.data?.step) {
+      return res.json(result)
+    }
+
     res.cookie("access_token", result.accessToken, {
       maxAge: 86400 * 1000
     });
@@ -25,8 +32,10 @@ const login = async (req, res, next) => {
     return res.json({
       status: true,
       message: "تم تسجيل الدخول بنجاح",
-      data: result.user,
-      accessToken: result.accessToken,
+      data: {
+        user: result.user,
+        accessToken: result.accessToken,
+      },
     });
   } catch (e) {
     next(e);

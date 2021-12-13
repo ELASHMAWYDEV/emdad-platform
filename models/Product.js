@@ -8,6 +8,11 @@ const {
 } = require("./constants");
 
 const ProductSchema = new Schema({
+  vendorId: {
+    type: Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   name: {
     type: String,
     required: true
@@ -16,10 +21,10 @@ const ProductSchema = new Schema({
     type: String,
     required: true,
   },
-  // productType: {
-  //   type: String,
-  //   required: true, // TODO: what are the product types ?
-  // },
+  productType: {
+    type: String,
+    required: true,
+  },
   units: {
     type: [{
       productUnit: {
@@ -38,7 +43,8 @@ const ProductSchema = new Schema({
   },
   images: {
     type: [String],
-    required: true
+    required: true,
+    minlength: 1
   },
   notes: {
     type: String,
@@ -47,11 +53,7 @@ const ProductSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  createdBy: {
-    type: Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
+
   modificationDate: {
     type: Date,
   }

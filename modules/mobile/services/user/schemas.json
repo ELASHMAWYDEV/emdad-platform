@@ -1,0 +1,24 @@
+{
+  "listVendorsSchema": {
+    "type": "object",
+    "properties": {
+      "searchQuery": {
+        "type": "string"
+      },
+      "vendorType": {
+        "type": "array",
+        "items": [
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "city": {
+        "type": "string"
+      },
+      "country": {
+        "type": "string"
+      }
+    }
+  }
+}

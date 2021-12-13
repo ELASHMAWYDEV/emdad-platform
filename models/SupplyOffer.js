@@ -5,7 +5,7 @@ const {
 } = require("mongoose");
 
 const SupplyOfferSchema = new Schema({
-  supplierId: {
+  vendorId: {
     type: Types.ObjectId,
     ref: "User",
     required: true,
@@ -25,10 +25,10 @@ const SupplyOfferSchema = new Schema({
   serviceDescription: {
     type: String, // TODO: what is the service description ?
   },
-  traderNotes: {
+  userNotes: {
     type: String,
   },
-  supplierNotes: {
+  vendorNotes: {
     type: String,
   },
   // TODO: add the products details here
