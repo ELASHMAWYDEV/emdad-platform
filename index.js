@@ -50,7 +50,7 @@ app.use((err, req, res, next) => {
       message: "هذا الحقل مسجل لدينا مسبقا ولا يمكن تسجيله مرة أخري"
     }]));
   } else {
-    return sendErrorResponse(res, new ApiError(errorCodes.UNKOWN_ERROR, undefined));
+    return sendErrorResponse(res, new ApiError(errorCodes.UNKOWN_ERROR, err.message));
   }
 });
 
