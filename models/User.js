@@ -61,7 +61,6 @@ const UserSchema = new Schema({
         required: true
       },
     },
-    unique: true
   },
   primaryEmail: {
     type: String,
@@ -70,7 +69,6 @@ const UserSchema = new Schema({
   },
   secondaryEmail: {
     type: String,
-    unique: true
   },
   userType: {
     type: String,
