@@ -25,6 +25,7 @@ const tempResponse = (req, res) => res.send("Not Working Yet");
 router.post("/auth/login", authenticationController.login);
 router.post("/auth/register", authenticationController.register);
 router.post("/auth/otp", checkToken, authenticationController.verifyOtp);
+router.post("/auth/otp/resend", checkToken, authenticationController.resendOtp);
 
 // Profile
 router.post("/profile/complete", checkToken, profileController.completeProfile);

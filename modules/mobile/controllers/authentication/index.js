@@ -1,29 +1,22 @@
-const {
-  loginUser,
-  registerNewUser,
-  verifyOneTimePass
-} = require("../../services/authentication");
+const authenticationService = require("../../services/authentication");
 
 const login = async (req, res, next) => {
   try {
-    const {
-      username,
-      password
-    } = req.body;
+    const { email, phone, password } = req.body;
 
-    const result = await loginUser({
-      username,
-      password
+    const result = await authenticationService.loginUser({
+      email,
+      phone,
+      password,
     });
-
 
     //Verification & Profile completion steps
     if (result.data?.step) {
-      return res.json(result)
+      return res.json(result);
     }
 
     res.cookie("access_token", result.accessToken, {
-      maxAge: 86400 * 1000
+      maxAge: 86400 * 1000,
     });
     res.cookie("user_data", JSON.stringify(result.user), {
       maxAge: 86400 * 1000,
@@ -45,7 +38,7 @@ const login = async (req, res, next) => {
 const register = async (req, res, next) => {
   try {
     const user = req.body;
-    const result = await registerNewUser(user);
+    const result = await authenticationService.registerNewUser(user);
 
     return res.json({
       status: true,
@@ -58,17 +51,13 @@ const register = async (req, res, next) => {
   }
 };
 
-
 const verifyOtp = async (req, res, next) => {
   try {
-    const {
-      otp,
-      type
-    } = req.body;
-    await verifyOneTimePass({
+    const { otp, type } = req.body;
+    await authenticationService.verifyOneTimePass({
       userId: req.user._id,
       otp,
-      type
+      type,
     });
 
     return res.json({
@@ -81,8 +70,24 @@ const verifyOtp = async (req, res, next) => {
   }
 };
 
+const resendOtp = async (req, res, next) => {
+  try {
+    const { type } = req.body;
+    const result = await authenticationService.sendOtp(req.user._id, type);
+
+    return res.json({
+      status: true,
+      message: `تم ارسال الكود الي ${type == "phone" ? "رقم هاتفك" : "بريدك الالكتروني"}`,
+      data: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   login,
   register,
-  verifyOtp
+  verifyOtp,
+  resendOtp,
 };

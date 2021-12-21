@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/User");
+const ApiError = require("../errors/ApiError");
+const { errorCodes } = require("../errors");
 
 const createToken = async (payload) => {
   try {
@@ -18,34 +20,28 @@ const checkToken = async (req, res, next) => {
       (req.cookies && req.cookies["access_token"]);
 
     if (!token) {
-      return res.json({
-        status: false,
-        message: "You must login first"
-      });
+      throw new ApiError(errorCodes.UNAUTHURIZED);
     }
 
-    const user = await jwt.verify(token, process.env.ACCESS_TOKEN || "randomaccesstoken");
+    const user = jwt.verify(token, process.env.ACCESS_TOKEN || "randomaccesstoken");
 
     //check DB existence
     const searchUser = await UserModel.findOne({
-      _id: user._id
+      _id: user._id,
     });
     if (searchUser) {
       req.user = searchUser;
       return next();
     } else {
-      return res.json({
-        status: false,
-        message: "You must login first"
-      });
+      throw new ApiError(errorCodes.UNAUTHURIZED);
     }
   } catch (e) {
     console.log(e);
-    return next();
+    next(new ApiError(errorCodes.UNAUTHURIZED));
   }
 };
 
 module.exports = {
   createToken,
-  checkToken
+  checkToken,
 };

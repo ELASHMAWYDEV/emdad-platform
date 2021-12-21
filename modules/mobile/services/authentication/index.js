@@ -10,34 +10,25 @@ const {
   SMTP_PASS,
 } = require("../../../../globals");
 const twilioClient = require("twilio")(TWILIO_SID, TWILIO_TOKEN);
-const {
-  errorCodes
-} = require("../../../../errors");
+const { errorCodes } = require("../../../../errors");
 const UserModel = require("../../../../models/User");
 const OtpModel = require("../../../../models/Otp");
-const {
-  countryCodes
-} = require("../../../../models/constants");
-const {
-  createToken
-} = require("../../../../middlewares/jwt");
-const {
-  validateSchema
-} = require("../../../../middlewares/schema");
+const { countryCodes } = require("../../../../models/constants");
+const { createToken } = require("../../../../middlewares/jwt");
+const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas.json");
 const ApiError = require("../../../../errors/ApiError");
 
-const checkPhoneNumber = ({
-  countryCode,
-  number
-}) => {
+const checkPhoneNumber = ({ countryCode, number }) => {
   switch (countryCode) {
     case countryCodes.EG:
       if (number.length < 10 || number.length > 11)
-        throw new ApiError(errorCodes.VALIDATION_ERROR, [{
-          key: "number",
-          message: "رقم الهاتف غير صحيح",
-        }, ]);
+        throw new ApiError(errorCodes.VALIDATION_ERROR, [
+          {
+            key: "number",
+            message: "رقم الهاتف غير صحيح",
+          },
+        ]);
       number = number.charAt(0) == "0" ? number : `0${number}`;
       return {
         countryCode,
@@ -45,34 +36,35 @@ const checkPhoneNumber = ({
       };
     case countryCodes.SA:
       if (number.length < 9 || number.length > 10)
-        throw new ApiError(errorCodes.VALIDATION_ERROR, [{
-          key: "number",
-          message: "رقم الهاتف غير صحيح",
-        }, ]);
+        throw new ApiError(errorCodes.VALIDATION_ERROR, [
+          {
+            key: "number",
+            message: "رقم الهاتف غير صحيح",
+          },
+        ]);
       number = number.charAt(0) == "0" ? number : `0${number}`;
       return {
         countryCode,
         number,
       };
     default:
-      throw new ApiError(errorCodes.VALIDATION_ERROR, [{
-        key: "countryCode",
-        message: `كود الدولة ${countryCode} غير مدعوم`,
-      }, ]);
+      throw new ApiError(errorCodes.VALIDATION_ERROR, [
+        {
+          key: "countryCode",
+          message: `كود الدولة ${countryCode} غير مدعوم`,
+        },
+      ]);
   }
 };
 
 /*******************************************/
 
-const sendOtp = async (userId) => {
+const sendOtp = async (userId, type) => {
   const userSearch = await UserModel.findById(userId);
 
   if (!userSearch) throw new Error(`The user is with ID: ${userId} is not registered`);
 
-  const {
-    primaryPhoneNumber,
-    primaryEmail
-  } = userSearch;
+  const { primaryPhoneNumber, primaryEmail } = userSearch;
 
   if (!primaryPhoneNumber) throw new ApiError(errorCodes.USER_HAS_NO_PHONE);
   if (!primaryEmail) throw new ApiError(errorCodes.USER_HAS_NO_EMAIL);
@@ -80,39 +72,46 @@ const sendOtp = async (userId) => {
   //Check if there is unverified otp already
   const unverifiedOtps = await OtpModel.find({
     userId,
-    isVerified: false
+    isVerified: false,
   });
 
   let phoneOtp, emailOtp;
   if (unverifiedOtps.length == 0) {
-
     //Create the otp for the user 4-digit-otp
     phoneOtp = Math.floor(Math.random() * (9999 - 1000 + 1) + 1000);
     emailOtp = Math.floor(Math.random() * (9999 - 1000 + 1) + 1000);
 
     //Save on DB
-    await OtpModel.insertMany([{
-      userId: userSearch._id,
-      type: "phone",
-      otp: phoneOtp
-    }, {
-      userId: userSearch._id,
-      type: "email",
-      otp: emailOtp
-    }])
-
+    await OtpModel.insertMany([
+      ...[
+        (!type || type == "phone") && {
+          userId: userSearch._id,
+          type: "phone",
+          otp: phoneOtp,
+        },
+      ],
+      ...[
+        (!type || type == "email") && {
+          userId: userSearch._id,
+          type: "email",
+          otp: emailOtp,
+        },
+      ],
+    ]);
   } else {
-    phoneOtp = unverifiedOtps.find(e => e.type == "phone").otp;
-    emailOtp = unverifiedOtps.find(e => e.type == "email").otp;
+    if (!type || type == "phone") phoneOtp = unverifiedOtps.find((e) => e.type == "phone").otp;
+    if (!type || type == "email") emailOtp = unverifiedOtps.find((e) => e.type == "email").otp;
   }
 
-  // if (phoneOtp) {
-  //   await twilioClient.messages.create({
-  //     body: `Your OTP is: ${phoneOtp}`,
-  //     messagingServiceSid: TWILIO_SERVICE_ID,
-  //     to: `${primaryPhoneNumber.countryCode}${primaryPhoneNumber.number.slice(1)}`
-  //   });
-  // }
+  if (phoneOtp) {
+    await twilioClient.messages.create({
+      body: `Your OTP is: ${phoneOtp}`,
+      messagingServiceSid: TWILIO_SERVICE_ID,
+      to: `${primaryPhoneNumber.countryCode}${primaryPhoneNumber.number.slice(1)}`,
+    });
+
+    if (type == "phone") return { phoneOtp };
+  }
 
   if (emailOtp) {
     let transporter = nodemailer.createTransport({
@@ -120,8 +119,8 @@ const sendOtp = async (userId) => {
       port: parseInt(SMTP_PORT),
       auth: {
         user: SMTP_USER,
-        pass: SMTP_PASS
-      }
+        pass: SMTP_PASS,
+      },
     });
 
     transporter.sendMail({
@@ -138,63 +137,72 @@ const sendOtp = async (userId) => {
           </div>
         </div>
       </body>
-      `
-    })
+      `,
+    });
+
+    if (type == "email") return { emailOtp };
   }
-}
+  return {
+    emailOtp,
+    phoneOtp,
+  };
+};
 
 /*******************************************/
 
-
-const verifyOneTimePass = validateSchema(schemas.verifyOtpSchema)(async ({
-  userId,
-  otp,
-  type
-}) => {
+const verifyOneTimePass = validateSchema(schemas.verifyOtpSchema)(async ({ userId, otp, type }) => {
   //Search for it on DB
   const otpSearch = await OtpModel.find({
     userId,
     type,
     otp,
-    isVerified: false
+    isVerified: false,
   });
 
   if (otpSearch.length == 0) throw new ApiError(errorCodes.OTP_INCORRECT);
 
   //Set all otps' from this type to verified!
-  await OtpModel.updateMany({
-    userId,
-    type,
-    isVerified: false
-  }, {
-    $set: {
-      isVerified: true
+  await OtpModel.updateMany(
+    {
+      userId,
+      type,
+      isVerified: false,
+    },
+    {
+      $set: {
+        isVerified: true,
+      },
     }
-  });
-
+  );
 
   //Check if there are no more otps & verify the user
-  if (!await OtpModel.findOne({
-      userId
+  if (
+    !(await OtpModel.findOne({
+      userId,
     }))
-    await UserModel.updateOne({
-      _id: userId
-    }, {
-      $set: {
-        isVerified: true
+  )
+    await UserModel.updateOne(
+      {
+        _id: userId,
+      },
+      {
+        $set: {
+          isVerified: true,
+        },
       }
-    });
-})
+    );
+});
 
 /*******************************************/
 
-const loginUser = validateSchema(schemas.loginSchema)(async ({
-  username,
-  password,
-  firebaseToken
-}) => {
+const loginUser = validateSchema(schemas.loginSchema)(async ({ email, phone, password, firebaseToken }) => {
   let userObject = await UserModel.findOne({
-    username,
+    $or: [
+      { primaryEmail: email },
+      { secondaryEmail: email },
+      { "primaryPhoneNumber.number": phone },
+      { "secondaryPhoneNumber.number": phone },
+    ],
   });
 
   if (!userObject) throw new ApiError(errorCodes.WRONG_LOGIN_CREDENTIALS);
@@ -205,31 +213,35 @@ const loginUser = validateSchema(schemas.loginSchema)(async ({
   }
 
   //Update firebase token
-  await UserModel.updateOne({
-    username
-  }, {
-    $set: {
-      firebaseToken
+  await UserModel.updateOne(
+    {
+      _id: userObject._id,
+    },
+    {
+      $set: {
+        firebaseToken,
+      },
     }
-  });
+  );
 
   //Send the jwt token with the success response
   const accessToken = await createToken({
     _id: userObject._id,
-    userType: userObject.userType
+    userType: userObject.userType,
   });
 
   //Check for OTP
   if (userObject.isVerified == false) {
-    await sendOtp(userObject._id);
+    const otps = await sendOtp(userObject._id); // @TODO: remove the return from sendOtp
     return {
       status: true,
       message: "يجب عليك تأكيد هاتفك وبريدك الالكتروني",
       data: {
         accessToken,
-        step: "verification"
-      }
-    }
+        step: "verification",
+        ...otps,
+      },
+    };
   }
 
   //Check for profile completion
@@ -239,14 +251,10 @@ const loginUser = validateSchema(schemas.loginSchema)(async ({
       message: "يجب عليك اكمال بياناتك أولا",
       data: {
         accessToken,
-        step: "profile"
-      }
-    }
+        step: "profile",
+      },
+    };
   }
-
-
-
-
 
   return {
     accessToken,
@@ -286,5 +294,6 @@ const registerNewUser = validateSchema(schemas.registrationSchema)(async (user) 
 module.exports = {
   loginUser,
   registerNewUser,
-  verifyOneTimePass
+  verifyOneTimePass,
+  sendOtp
 };

@@ -4,6 +4,7 @@ const statuses = {
 
 const errorCodes = Object.freeze({
   UNKOWN_ERROR: "UNKOWN_ERROR",
+  UNAUTHURIZED: "UNAUTHURIZED",
   EMPTY_FIELD: "EMPTY_FIELD",
   WRONG_LOGIN_CREDENTIALS: "WRONG_LOGIN_CREDENTIALS",
   VALIDATION_ERROR: "VALIDATION_ERROR",
@@ -22,6 +23,10 @@ const errors = Object.freeze({
   [errorCodes.UNKOWN_ERROR]: {
     status: statuses.OK,
     message: "حدث خطأ غير معروف ، يرجي اعادة المحاولة",
+  },
+  [errorCodes.UNAUTHURIZED]: {
+    status: statuses.OK,
+    message: "يجب تسجيل الدخول أولا",
   },
   [errorCodes.EMPTY_FIELD]: {
     status: statuses.OK,

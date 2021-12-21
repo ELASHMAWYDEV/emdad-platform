@@ -2,11 +2,13 @@
   "loginSchema": {
     "type": "object",
     "required": [
-      "username",
       "password"
     ],
     "properties": {
-      "username": {
+      "email": {
+        "type": "string"
+      },
+      "phone": {
         "type": "string"
       },
       "password": {
@@ -21,16 +23,12 @@
     "type": "object",
     "required": [
       "name",
-      "username",
       "password",
       "primaryPhoneNumber",
       "primaryEmail"
     ],
     "properties": {
       "name": {
-        "type": "string"
-      },
-      "username": {
         "type": "string"
       },
       "password": {

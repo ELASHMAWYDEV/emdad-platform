@@ -30,11 +30,6 @@ const UserSchema = new Schema({
     required: true,
     default: false
   },
-  username: {
-    type: String,
-    required: true,
-    unique: true
-  },
   password: {
     type: String,
     required: true,
@@ -87,7 +82,6 @@ const UserSchema = new Schema({
   },
   commercialRegister: {
     type: String,
-    unique: true,
     required: isUserTypeSpecified
   },
   transportationMethodDescription: {
