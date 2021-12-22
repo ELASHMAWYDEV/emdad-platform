@@ -197,12 +197,7 @@ const verifyOneTimePass = validateSchema(schemas.verifyOtpSchema)(async ({ userI
 
 const loginUser = validateSchema(schemas.loginSchema)(async ({ email, phone, password, firebaseToken }) => {
   let userObject = await UserModel.findOne({
-    $or: [
-      { primaryEmail: email },
-      { secondaryEmail: email },
-      { "primaryPhoneNumber.number": phone },
-      { "secondaryPhoneNumber.number": phone },
-    ],
+    $or: [...[email && { primaryEmail: email }], ...[phone && { "primaryPhoneNumber.number": phone }]].filter((x) => x),
   });
 
   if (!userObject) throw new ApiError(errorCodes.WRONG_LOGIN_CREDENTIALS);
@@ -295,5 +290,5 @@ module.exports = {
   loginUser,
   registerNewUser,
   verifyOneTimePass,
-  sendOtp
+  sendOtp,
 };
