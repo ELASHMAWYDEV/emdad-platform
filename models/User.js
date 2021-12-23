@@ -1,11 +1,5 @@
-const {
-  Schema,
-  model
-} = require("mongoose");
-const {
-  userTypes,
-  countryCodes
-} = require("./constants");
+const { Schema, model } = require("mongoose");
+const { userTypes, countryCodes } = require("./constants");
 
 const pointSchema = new Schema({
   type: {
@@ -28,7 +22,7 @@ const UserSchema = new Schema({
   isVerified: {
     type: Boolean,
     required: true,
-    default: false
+    default: false,
   },
   password: {
     type: String,
@@ -39,33 +33,33 @@ const UserSchema = new Schema({
       countryCode: {
         type: String,
         enum: Object.values(countryCodes),
-        required: true
+        required: true,
       },
       number: {
         type: String,
-        required: true
+        required: true,
       },
     },
     required: true,
-    unique: true
+    unique: true,
   },
   secondaryPhoneNumber: {
     type: {
       countryCode: {
         type: String,
         enum: Object.values(countryCodes),
-        required: true
+        required: true,
       },
       number: {
         type: String,
-        required: true
+        required: true,
       },
     },
   },
   primaryEmail: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   secondaryEmail: {
     type: String,
@@ -80,7 +74,7 @@ const UserSchema = new Schema({
   },
   commercialRegister: {
     type: String,
-    required: isUserTypeSpecified
+    required: isUserTypeSpecified && !isTransporterTypeRequired,
   },
   transportationMethodDescription: {
     type: String,
@@ -88,7 +82,7 @@ const UserSchema = new Schema({
   location: {
     type: pointSchema,
     index: "2dsphere",
-    required: isUserTypeSpecified
+    required: isUserTypeSpecified,
   },
   creationDate: {
     type: Date,
@@ -109,16 +103,20 @@ const UserSchema = new Schema({
   country: {
     type: String,
     enum: Object.keys(countryCodes),
-    required: isUserTypeSpecified
+    required: isUserTypeSpecified,
   },
   city: {
     type: String,
-    required: isUserTypeSpecified
-  }
+    required: isUserTypeSpecified,
+  },
 });
 
 function isVendorTypeRequired() {
   return this.userType == userTypes.VENDOR;
+}
+
+function isTransporterTypeRequired() {
+  return this.userType == userTypes.TRANSPORTER;
 }
 
 function isUserTypeSpecified() {

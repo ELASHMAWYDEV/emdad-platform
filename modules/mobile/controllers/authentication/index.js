@@ -2,11 +2,10 @@ const authenticationService = require("../../services/authentication");
 
 const login = async (req, res, next) => {
   try {
-    const { email, phone, password } = req.body;
+    const { user, password } = req.body;
 
     const result = await authenticationService.loginUser({
-      email,
-      phone,
+      user,
       password,
     });
 

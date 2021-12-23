@@ -2,10 +2,11 @@
   "loginSchema": {
     "type": "object",
     "required": [
+      "user",
       "password"
     ],
     "properties": {
-      "email": {
+      "user": {
         "type": "string"
       },
       "phone": {

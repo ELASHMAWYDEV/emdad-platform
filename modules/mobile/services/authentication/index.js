@@ -98,9 +98,10 @@ const sendOtp = async (userId, type) => {
         },
       ],
     ]);
-  } else {
-    if (!type || type == "phone") phoneOtp = unverifiedOtps.find((e) => e.type == "phone").otp;
-    if (!type || type == "email") emailOtp = unverifiedOtps.find((e) => e.type == "email").otp;
+  } else if ((!type || type == "phone") && unverifiedOtps.find((e) => e.type == "phone")) {
+    phoneOtp = unverifiedOtps.find((e) => e.type == "phone").otp;
+  } else if ((!type || type == "email") && unverifiedOtps.find((e) => e.type == "email")) {
+    emailOtp = unverifiedOtps.find((e) => e.type == "email").otp;
   }
 
   if (phoneOtp) {
@@ -179,6 +180,7 @@ const verifyOneTimePass = validateSchema(schemas.verifyOtpSchema)(async ({ userI
   if (
     !(await OtpModel.findOne({
       userId,
+      isVerified: false,
     }))
   )
     await UserModel.updateOne(
@@ -195,9 +197,9 @@ const verifyOneTimePass = validateSchema(schemas.verifyOtpSchema)(async ({ userI
 
 /*******************************************/
 
-const loginUser = validateSchema(schemas.loginSchema)(async ({ email, phone, password, firebaseToken }) => {
+const loginUser = validateSchema(schemas.loginSchema)(async ({ user, password, firebaseToken }) => {
   let userObject = await UserModel.findOne({
-    $or: [...[email && { primaryEmail: email }], ...[phone && { "primaryPhoneNumber.number": phone }]].filter((x) => x),
+    $or: [{ primaryEmail: user }, { "primaryPhoneNumber.number": user }],
   });
 
   if (!userObject) throw new ApiError(errorCodes.WRONG_LOGIN_CREDENTIALS);
