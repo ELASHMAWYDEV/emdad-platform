@@ -6,7 +6,6 @@
       "_id",
       "userType",
       "oraganizationName",
-      "commercialRegister",
       "location",
       "country",
       "city"
@@ -40,6 +39,9 @@
           "SA",
           "EG"
         ]
+      },
+      "transportationMethodDescription": {
+        "type": "string"
       },
       "oraganizationName": {
         "type": "string"
