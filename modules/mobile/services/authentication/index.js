@@ -98,9 +98,13 @@ const sendOtp = async (userId, type) => {
         },
       ],
     ]);
-  } else if ((!type || type == "phone") && unverifiedOtps.find((e) => e.type == "phone")) {
+  }
+
+  if ((!type || type == "phone") && unverifiedOtps.find((e) => e.type == "phone")) {
     phoneOtp = unverifiedOtps.find((e) => e.type == "phone").otp;
-  } else if ((!type || type == "email") && unverifiedOtps.find((e) => e.type == "email")) {
+  }
+
+  if ((!type || type == "email") && unverifiedOtps.find((e) => e.type == "email")) {
     emailOtp = unverifiedOtps.find((e) => e.type == "email").otp;
   }
 
@@ -232,7 +236,7 @@ const loginUser = validateSchema(schemas.loginSchema)(async ({ user, password, f
     const otps = await sendOtp(userObject._id); // @TODO: remove the return from sendOtp
     return {
       status: true,
-      message: "يجب عليك تأكيد هاتفك وبريدك الالكتروني",
+      message: `يجب تأكيد ${otps.phoneOtp ? "هاتفك ," : ""} ${otps.emailOtp ? "بريدك الالكتروني" : ""} أولا`,
       data: {
         accessToken,
         step: "verification",

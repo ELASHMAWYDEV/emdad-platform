@@ -23,12 +23,12 @@ const listVendors = validateSchema(schemas.listVendorsSchema)(async ({
 }) => {
 
   const vendors = await UserModel.find({
+    userType: userTypes.VENDOR,
     ...(paginationToken && {
       _id: {
         $gt: paginationToken
       }
     }),
-    userType: userTypes.VENDOR,
     ...(searchQuery && {
       oraganizationName: {
         $regex: ".*" + searchQuery + ".*"
