@@ -11,10 +11,6 @@ const getMobileSettings = async () => {
 
   if (!settings) throw new ApiError(errorCodes.NO_SETTINGS_FOUND);
 
-  settings = {
-    ...settings,
-    countries: Object.keys(countryCodes).map((code) => ({ code, name: code == "SA" ? "السعودية" : "مصر" })), // @TODO: Better user for countries
-  };
   return settings;
 };
 

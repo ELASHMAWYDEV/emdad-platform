@@ -270,6 +270,17 @@ const registerNewUser = validateSchema(schemas.registrationSchema)(async (user) 
   if (user.primaryPhoneNumber) user.primaryPhoneNumber = checkPhoneNumber(user.primaryPhoneNumber);
   if (user.secondaryPhoneNumber) user.secondaryPhoneNumber = checkPhoneNumber(user.secondaryPhoneNumber);
 
+  // Extra check on primary & secondary numbers -> mongo doesn't handle it properly
+  if (await UserModel.findOne({ "primaryPhoneNumber.number": user.primaryPhoneNumber.number }))
+    throw new ApiError(errorCodes.DUPLICATION_ERROR, [
+      { key: "primaryPhoneNumber", message: "رقم الهاتف الاساسي مسجل من قبل" },
+    ]);
+
+  if (await UserModel.findOne({ "secondaryPhoneNumber.number": user.secondaryPhoneNumber.number }))
+    throw new ApiError(errorCodes.DUPLICATION_ERROR, [
+      { key: "secondaryPhoneNumber", message: "رقم الهاتف الاساسي مسجل من قبل" },
+    ]);
+
   //Encrypt password
   const hashedPassword = await bcrypt.hash(user.password, 10);
 

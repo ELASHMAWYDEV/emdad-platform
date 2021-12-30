@@ -1,8 +1,4 @@
-const {
-  Schema,
-  model,
-  Types
-} = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 
 const pointSchema = new Schema({
   type: {
@@ -17,48 +13,35 @@ const pointSchema = new Schema({
   },
 });
 
-const SupplyRequestSchema = new Schema({
-  userId: {
-    type: Types.ObjectId,
-    ref: "User",
-    required: true,
+const SupplyRequestSchema = new Schema(
+  {
+    userId: {
+      type: Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    vendorId: {
+      type: Types.ObjectId,
+      ref: "User",
+    }, //Assigned after the offer is accepted
+    userLocation: {
+      type: pointSchema,
+      index: "2dsphere",
+      required: true,
+    },
+    userLocationDescription: {
+      type: String,
+      required: true,
+    },
+    transportationMethod: {
+      type: String,
+    }, //Assigned after the offer is accepted
+    supplyDate: {
+      type: Date,
+      required: true,
+    },
   },
-  vendorId: {
-    type: Types.ObjectId,
-    ref: "User",
-  }, //Assigned after the offer is accepted
-  userLocation: {
-    type: pointSchema,
-    index: "2dsphere",
-    required: true,
-  },
-  userLocationDescription: {
-    type: String,
-    required: true,
-  },
-  transportationMethod: {
-    type: String,
-  }, //Assigned after the offer is accepted
-  supplyDate: {
-    type: Date,
-    required: true,
-  },
-  creationDate: {
-    type: Date,
-    default: Date.now,
-  },
-  createdBy: {
-    type: Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  modificationDate: {
-    type: Date,
-  },
-  modifiedBy: {
-    type: Types.ObjectId,
-    ref: "User",
-  },
-});
+  { timestamps: true }
+);
 
 module.exports = model("SupplyRequest", SupplyRequestSchema, "supplyRequests");

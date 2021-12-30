@@ -42,8 +42,10 @@ const register = async (req, res, next) => {
     return res.json({
       status: true,
       message: "تم تسجيل حسابك بنجاح ، يرجي استكمال بياناتك",
-      data: result.user,
-      accessToken: result.accessToken,
+      data: {
+        user: result.user,
+        accessToken: result.accessToken,
+      },
     });
   } catch (e) {
     next(e);

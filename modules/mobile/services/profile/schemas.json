@@ -5,7 +5,6 @@
     "required": [
       "_id",
       "userType",
-      "oraganizationName",
       "location",
       "country",
       "city"
@@ -40,8 +39,13 @@
           "EG"
         ]
       },
-      "transportationMethodDescription": {
-        "type": "string"
+      "transportationMethods": {
+        "type": "array",
+        "items": [
+          {
+            "type": "string"
+          }
+        ]
       },
       "oraganizationName": {
         "type": "string"

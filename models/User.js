@@ -14,102 +14,90 @@ const pointSchema = new Schema({
   },
 });
 
-const UserSchema = new Schema({
-  name: {
+const phoneNumberSchema = new Schema({
+  countryCode: {
     type: String,
+    enum: Object.values(countryCodes),
     required: true,
   },
-  isVerified: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  primaryPhoneNumber: {
-    type: {
-      countryCode: {
-        type: String,
-        enum: Object.values(countryCodes),
-        required: true,
-      },
-      number: {
-        type: String,
-        required: true,
-      },
-    },
-    required: true,
-    unique: true,
-  },
-  secondaryPhoneNumber: {
-    type: {
-      countryCode: {
-        type: String,
-        enum: Object.values(countryCodes),
-        required: true,
-      },
-      number: {
-        type: String,
-        required: true,
-      },
-    },
-  },
-  primaryEmail: {
+  number: {
     type: String,
     required: true,
     unique: true,
-  },
-  secondaryEmail: {
-    type: String,
-  },
-  userType: {
-    type: String,
-    enum: Object.values(userTypes),
-  },
-  oraganizationName: {
-    type: String,
-    required: isUserTypeSpecified,
-  },
-  commercialRegister: {
-    type: String,
-    required: isUserTypeSpecified && !isTransporterTypeRequired,
-  },
-  transportationMethodDescription: {
-    type: String,
-  },
-  location: {
-    type: pointSchema,
-    index: "2dsphere",
-    required: isUserTypeSpecified,
-  },
-  creationDate: {
-    type: Date,
-    default: Date.now,
-  },
-  modificationDate: {
-    type: Date,
-    default: null,
-  },
-
-  vendorType: {
-    type: [String],
-    required: isVendorTypeRequired,
-  },
-  firebaseToken: {
-    type: String,
-  },
-  country: {
-    type: String,
-    enum: Object.keys(countryCodes),
-    required: isUserTypeSpecified,
-  },
-  city: {
-    type: String,
-    required: isUserTypeSpecified,
   },
 });
+
+const UserSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    isVerified: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    primaryPhoneNumber: {
+      type: phoneNumberSchema,
+      required: true,
+    },
+    secondaryPhoneNumber: {
+      type: phoneNumberSchema,
+    },
+    primaryEmail: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    secondaryEmail: {
+      type: String,
+    },
+    userType: {
+      type: String,
+      enum: Object.values(userTypes),
+    },
+    oraganizationName: {
+      type: String,
+      required: isUserTypeSpecified,
+    },
+    commercialRegister: {
+      type: String,
+      required: isUserTypeSpecified && !isTransporterTypeRequired,
+    },
+    location: {
+      type: pointSchema,
+      index: "2dsphere",
+      required: isUserTypeSpecified,
+    },
+
+    vendorType: {
+      type: [String],
+      required: isVendorTypeRequired,
+    },
+    firebaseToken: {
+      type: String,
+    },
+    country: {
+      type: String,
+      enum: Object.keys(countryCodes),
+      required: isUserTypeSpecified,
+    },
+    city: {
+      type: String,
+      required: isUserTypeSpecified,
+    },
+    transportationMethods: {
+      type: [String],
+      required: isTransporterTypeRequired,
+    },
+  },
+  { timestamps: true }
+);
 
 function isVendorTypeRequired() {
   return this.userType == userTypes.VENDOR;

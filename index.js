@@ -6,14 +6,11 @@ const app = express();
 const dashboardRoutes = require("./modules/dashboard/routes");
 const mobileRoutes = require("./modules/mobile/routes");
 const ApiError = require("./errors/ApiError");
-const {
-  errorCodes
-} = require("./errors");
+const { errorCodes } = require("./errors");
 
 // Init
 require("./globals");
 require("./init");
-
 
 //Middlewares
 app.use(cors());
@@ -38,17 +35,21 @@ const sendErrorResponse = (res, err) => {
 };
 
 app.use((err, req, res, next) => {
-  console.log(err.errorCode, err);
+  console.log(err.message);
   if (err instanceof ApiError) {
     // API Error
     return sendErrorResponse(res, new ApiError(err.errorCode, err.details));
-
   } else if (err.code == 11000) {
-    // Duplication Error 
-    return sendErrorResponse(res, new ApiError(errorCodes.DUPLICATION_ERROR, [{
-      key: Object.keys(err.keyValue)[0],
-      message: "هذا الحقل مسجل لدينا مسبقا ولا يمكن تسجيله مرة أخري"
-    }]));
+    // Duplication Error
+    return sendErrorResponse(
+      res,
+      new ApiError(errorCodes.DUPLICATION_ERROR, [
+        {
+          key: Object.keys(err.keyValue)[0],
+          message: "هذا الحقل مسجل لدينا مسبقا ولا يمكن تسجيله مرة أخري",
+        },
+      ])
+    );
   } else {
     return sendErrorResponse(res, new ApiError(errorCodes.UNKOWN_ERROR, err.message));
   }
