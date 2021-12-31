@@ -16,7 +16,6 @@ const denormalizedProductSchema = new Schema({
     type: Number,
     required: true,
   },
-  
 });
 
 const ProductSchema = new Schema(
@@ -64,6 +63,7 @@ const ProductSchema = new Schema(
       type: [String],
       required: true,
       minlength: 1,
+      default: ["default.png"],
     },
     notes: {
       type: String,

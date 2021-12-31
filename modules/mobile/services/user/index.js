@@ -8,6 +8,7 @@ const { errorCodes } = require("../../../../errors");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas");
 const { Types } = require("mongoose");
+const { WEBSITE_URL } = require("../../../../globals");
 
 const listVendors = validateSchema(schemas.listVendorsSchema)(
   async ({ paginationToken = null, searchQuery = "", vendorType = "", city = "", country = "" }) => {
@@ -86,7 +87,9 @@ const getVendorProducts = async ({ vendorId, categorized = false, productType = 
     return {
       categories: productCategories.map((category) => ({
         category: category,
-        products: products.filter((p) => p.productType.includes(category)),
+        products: products
+          .filter((p) => p.productType.includes(category))
+          .map((p) => ({ ...p, images: p.images.map((img) => `${WEBSITE_URL}/images/products/${img}`) })),
       })),
     };
   } else {

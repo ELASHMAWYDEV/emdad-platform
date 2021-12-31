@@ -20,6 +20,7 @@ const completeProfile = async (req, res, next) => {
 
 const editProfile = async (req, res, next) => {
   try {
+    console.log(req.hostname, req.protocol);
     const userData = req.body;
     const result = await ProfileService.editUserProfile({
       ...userData,

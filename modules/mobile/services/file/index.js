@@ -17,6 +17,8 @@ const uploadImages = ({ type, files }) => {
       logo.uniqueName = `${uuid4()}.${logo.extension}`;
       if (!["jpg", "png", "jpeg"].includes(logo.extension)) throw new ApiError(errorCodes.IMAGE_TYPE_NOT_SUPPORTED);
 
+      logo.mv(path.join(__dirname, "..", "..", "..", "..", "images", "users", logo.uniqueName));
+
       return { logo: logo.uniqueName };
     case "products":
       if (!Array.isArray(images)) images = [images];

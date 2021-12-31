@@ -4,8 +4,13 @@ const { errorCodes } = require("../../../../errors");
 const UserModel = require("../../../../models/User");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas.js");
+const { WEBSITE_URL } = require("../../../../globals");
 
 const completeUserProfile = validateSchema(schemas.completeProfileSchema)(async ({ _id, location, ...user }) => {
+  // Validation on logo
+  if (user.logo && !/\w+-\w+-\w+-\w+-\w+\.\w+/.test(user.logo))
+    throw new Error("الصورة التي ارسلتها  لم تقم برفعها من قبل");
+
   //Check if user already updated his profile
   if (
     await UserModel.findOne({
@@ -26,18 +31,23 @@ const completeUserProfile = validateSchema(schemas.completeProfileSchema)(async 
       location: {
         coordinates: [location.lng, location.lat],
       },
-      modificationDate: new Date(),
     }
   );
 
   // Get the user after update
-  const userSearch = await UserModel.findById(_id);
+  let userSearch = await UserModel.findById(_id);
+
+  // Set the logo url
+  if (userSearch.logo) userSearch.logo = `${WEBSITE_URL}/images/users/${userSearch.logo}`;
 
   return userSearch;
 });
 
 const editUserProfile = validateSchema(schemas.editProfileSchema)(async ({ _id, location, ...user }) => {
-  console.log(user);
+  // Validation on logo
+  if (user.logo && !/\w+-\w+-\w+-\w+-\w+\.\w+/.test(user.logo))
+    throw new Error("الصورة التي ارسلتها  لم تقم برفعها من قبل");
+
   await UserModel.updateOne(
     {
       _id,
@@ -49,12 +59,14 @@ const editUserProfile = validateSchema(schemas.editProfileSchema)(async ({ _id, 
           coordinates: [location.lng, location.lat],
         },
       }),
-      modificationDate: new Date(),
     }
   );
 
   // Get the user after update
-  const userSearch = await UserModel.findById(_id);
+  let userSearch = await UserModel.findById(_id);
+
+  // Set the logo url
+  if (userSearch.logo) userSearch.logo = `${WEBSITE_URL}/images/users/${userSearch.logo}`;
 
   return userSearch;
 });
