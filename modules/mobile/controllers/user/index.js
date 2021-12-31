@@ -3,9 +3,7 @@ const SettingsService = require("../../services/settings");
 
 const getHomeData = async (req, res, next) => {
   try {
-    const vendors = await UserService.listVendors({
-      fullData: true,
-    });
+    const vendors = await UserService.listVendors({});
     const favouriteVendors = await UserService.getFavouriteVendors(req.user._id);
     const featuredVendors = await SettingsService.listFeaturedVendors();
 
@@ -59,7 +57,7 @@ const getVendorProducts = async (req, res, next) => {
   try {
     const { vendorId } = req.params;
     const filters = req.query;
-    const result = await UserService.getVendorProducts({ vendorId, ...filters });
+    const result = await UserService.getVendorProducts({ vendorId, ...filters, categorized: true });
 
     return res.json({
       status: true,
@@ -89,11 +87,11 @@ const getProductInfo = async (req, res, next) => {
 const addVendorToFavourites = async (req, res, next) => {
   try {
     const { vendorId } = req.params;
-    await UserService.addVendorToFavourites({ vendorId, userId: req.user._id });
+    const result = await UserService.toggleVendorToFavourites({ vendorId, userId: req.user._id });
 
     return res.json({
       status: true,
-      message: "تم اضافة البائع الي المفضلة بنجاح",
+      message: result,
       data: null,
     });
   } catch (e) {

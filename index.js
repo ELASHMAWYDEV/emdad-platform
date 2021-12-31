@@ -1,5 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
+const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -16,6 +19,7 @@ require("./init");
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }));
 
 // API
 app.use("/api/mobile", mobileRoutes);
@@ -34,8 +38,23 @@ const sendErrorResponse = (res, err) => {
   });
 };
 
+//Serve images --> static
+app.get("/images/:path/:image", (req, res, next) => {
+  try {
+    //Check if file exists
+    if (fs.existsSync(path.join(__dirname, "images", req.params.path, req.params.image))) {
+      return res.sendFile(path.join(__dirname, "images", req.params.path, req.params.image));
+    } else if (fs.existsSync(path.join(__dirname, "images", req.params.path, "default.png"))) {
+      return res.sendFile(path.join(__dirname, "images", req.params.path, "default.png"));
+    } else {
+      return res.sendFile(path.join(__dirname, "images", "404.png"));
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+
 app.use((err, req, res, next) => {
-  console.log(err.message);
   if (err instanceof ApiError) {
     // API Error
     return sendErrorResponse(res, new ApiError(err.errorCode, err.details));

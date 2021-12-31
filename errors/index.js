@@ -18,6 +18,8 @@ const errorCodes = Object.freeze({
   NO_SUPPLIERS_FOUND: "NO_SUPPLIERS_FOUND",
   NO_SETTINGS_FOUND: "NO_SETTINGS_FOUND",
   PRODUCT_NOT_FOUND: "PRODUCT_NOT_FOUND",
+  NO_IMAGES_UPLOADED: "NO_IMAGES_UPLOADED",
+  IMAGE_TYPE_NOT_SUPPORTED: "IMAGE_TYPE_NOT_SUPPORTED",
 });
 
 const errors = Object.freeze({
@@ -80,6 +82,14 @@ const errors = Object.freeze({
   [errorCodes.PRODUCT_NOT_FOUND]: {
     status: statuses.OK,
     message: "لم نتمكن من ايجاد المنتج الذي تبحث عنه",
+  },
+  [errorCodes.NO_IMAGES_UPLOADED]: {
+    status: statuses.OK,
+    message: "لم تقم برفع اي صور",
+  },
+  [errorCodes.IMAGE_TYPE_NOT_SUPPORTED]: {
+    status: statuses.OK,
+    message: "يجب أن يكون امتداد الصور png أو jpeg أو jpg فقط",
   },
 });
 

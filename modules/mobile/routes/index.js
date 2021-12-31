@@ -87,5 +87,6 @@ router.post("/transporter/transportationOffers", checkToken, tempResponse);
 
 //Global
 router.get("/settings", settingsController.liseSettings);
+router.post("/images", settingsController.uploadImages);
 
 module.exports = router;

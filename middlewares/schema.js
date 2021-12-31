@@ -21,7 +21,6 @@ const validateSchema =
 
     if (!valid) {
       localize[lang](validate.errors);
-      console.log(args, validate.errors);
       throw new AjvError(validate.errors);
     }
     return func(args);
