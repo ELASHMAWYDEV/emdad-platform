@@ -29,14 +29,17 @@ const phoneNumberSchema = new Schema({
 
 const UserSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
     isVerified: {
       type: Boolean,
       required: true,
       default: false,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    logo: {
+      type: String,
     },
     password: {
       type: String,

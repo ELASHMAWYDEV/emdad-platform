@@ -23,23 +23,10 @@ const SupplyRequestSchema = new Schema(
     vendorId: {
       type: Types.ObjectId,
       ref: "User",
-    }, //Assigned after the offer is accepted
-    userLocation: {
-      type: pointSchema,
-      index: "2dsphere",
-      required: true,
-    },
-    userLocationDescription: {
-      type: String,
-      required: true,
     },
     transportationMethod: {
       type: String,
     }, //Assigned after the offer is accepted
-    supplyDate: {
-      type: Date,
-      required: true,
-    },
   },
   { timestamps: true }
 );

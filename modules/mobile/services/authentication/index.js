@@ -16,7 +16,7 @@ const OtpModel = require("../../../../models/Otp");
 const { countryCodes } = require("../../../../models/constants");
 const { createToken } = require("../../../../middlewares/jwt");
 const { validateSchema } = require("../../../../middlewares/schema");
-const schemas = require("./schemas.json");
+const schemas = require("./schemas");
 const ApiError = require("../../../../errors/ApiError");
 
 const checkPhoneNumber = ({ countryCode, number }) => {

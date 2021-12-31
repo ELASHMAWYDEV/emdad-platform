@@ -17,7 +17,7 @@ const getMobileSettings = async () => {
 const listFeaturedVendors = async () => {
   const settings = await SettingsModel.findOne({
     key: settingsKeys.FEATURED_VENDORS,
-  }).populate("featuredVendors");
+  }).populate("featuredVendors", "organizationName vendorType city country");
 
   if (!settings) throw new ApiError(errorCodes.NO_SETTINGS_FOUND);
   return settings.featuredVendors;

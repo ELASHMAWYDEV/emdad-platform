@@ -2,12 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 //middlewares
-const {
-  checkToken
-} = require("../../../middlewares/jwt");
-const userMiddleware = require("../../../middlewares/userMiddleware")
-const vendorMiddleware = require("../../../middlewares/vendorMiddleware")
-const transporterMiddleware = require("../../../middlewares/transporterMiddleware")
+const { checkToken } = require("../../../middlewares/jwt");
+const userMiddleware = require("../../../middlewares/userMiddleware");
+const vendorMiddleware = require("../../../middlewares/vendorMiddleware");
+const transporterMiddleware = require("../../../middlewares/transporterMiddleware");
 
 // Controllers
 const authenticationController = require("../controllers/authentication");
@@ -16,10 +14,7 @@ const userController = require("../controllers/user");
 const vendorController = require("../controllers/vendor");
 const settingsController = require("../controllers/settings");
 
-
-
 const tempResponse = (req, res) => res.send("Not Working Yet");
-
 
 // Authentication
 router.post("/auth/login", authenticationController.login);
@@ -37,9 +32,11 @@ router.post("/profile/email", checkToken, profileController.editEmail);
 router.get("/user/home", checkToken, userMiddleware, userController.getHomeData);
 
 router.get("/user/vendors", checkToken, userMiddleware, userController.getListOfVendors);
-router.get("/user/vendors/:vendorId", checkToken, userMiddleware, tempResponse);
-router.get("/user/vendors/:vendorId/products", checkToken, userMiddleware, tempResponse);
-router.get("/user/vendors/:vendorId/products/:productId", checkToken, userMiddleware, tempResponse);
+router.get("/user/vendors/:vendorId", checkToken, userMiddleware, userController.getVendorInfo);
+router.post("/user/vendors/:vendorId/favourite", checkToken, userMiddleware, userController.addVendorToFavourites);
+router.post("/user/vendors/:vendorId/rate", checkToken, userMiddleware, userController.rateVendor);
+router.get("/user/vendors/:vendorId/products", checkToken, userMiddleware, userController.getVendorProducts);
+router.get("/user/vendors/products/:productId", checkToken, userMiddleware, userController.getProductInfo);
 
 router.put("/user/supplyRequests", checkToken, userMiddleware, tempResponse);
 router.post("/user/supplyRequests/:supplyRequestId/resend", checkToken, userMiddleware, tempResponse);
@@ -87,7 +84,6 @@ router.get("/transporter/transportationRequests", checkToken, tempResponse);
 router.get("/transporter/transportationRequests/:transportationRequestId", checkToken, tempResponse);
 router.post("/transporter/transportationRequests/:transportationRequestId/changeStatus", checkToken, tempResponse);
 router.post("/transporter/transportationOffers", checkToken, tempResponse);
-
 
 //Global
 router.get("/settings", settingsController.liseSettings);

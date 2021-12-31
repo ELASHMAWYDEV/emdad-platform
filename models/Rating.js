@@ -1,15 +1,15 @@
 const { Schema, model, Types } = require("mongoose");
 
-const ProductRatingSchema = new Schema(
+const RatingSchema = new Schema(
   {
     userId: {
       type: Types.ObjectId,
       ref: "User",
       required: true,
     },
-    productId: {
+    targetId: {
       type: Types.ObjectId,
-      ref: "Product",
+      ref: "User",
       required: true,
     },
     rating: {
@@ -28,4 +28,4 @@ const ProductRatingSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = model("ProductRating", ProductRatingSchema, "productRatings");
+module.exports = model("Rating", RatingSchema, "ratings");

@@ -1,5 +1,6 @@
 const { Schema, model, Types } = require("mongoose");
-const { supportedLanguages } = require("./constants");
+const denormalizedProductSchema = new Schema({});
+
 
 const ProductSchema = new Schema(
   {
@@ -31,6 +32,10 @@ const ProductSchema = new Schema(
             type: Number,
             required: true,
           },
+          minimumAmountPerOrder: {
+            type: Number,
+            required: true,
+          },
         },
       ],
     },
@@ -49,5 +54,6 @@ const ProductSchema = new Schema(
   },
   { timestamps: true }
 );
+
 
 module.exports = model("Product", ProductSchema, "products");

@@ -17,6 +17,7 @@ const errorCodes = Object.freeze({
   PASSWORD_NOT_MATCH: "PASSWORD_NOT_MATCH",
   NO_SUPPLIERS_FOUND: "NO_SUPPLIERS_FOUND",
   NO_SETTINGS_FOUND: "NO_SETTINGS_FOUND",
+  PRODUCT_NOT_FOUND: "PRODUCT_NOT_FOUND",
 });
 
 const errors = Object.freeze({
@@ -76,9 +77,13 @@ const errors = Object.freeze({
     status: statuses.OK,
     message: "لا يوجد اعدادات في المنصة ، يرجي التواصل مع الدعم الفني",
   },
+  [errorCodes.PRODUCT_NOT_FOUND]: {
+    status: statuses.OK,
+    message: "لم نتمكن من ايجاد المنتج الذي تبحث عنه",
+  },
 });
 
 module.exports = {
   errorCodes,
-  errors
+  errors,
 };

@@ -7,7 +7,7 @@ const UserModel = require("../../../../models/User");
 const {
   validateSchema
 } = require("../../../../middlewares/schema");
-const schemas = require("./schemas.json");
+const schemas = require("./schemas");
 
 
 
