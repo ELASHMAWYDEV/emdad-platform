@@ -9,6 +9,7 @@ module.exports = {
       _id: {
         type: "object",
       },
+      logo: { type: "string", nullable: true },
       userType: {
         type: "string",
         enum: Object.values(userTypes),
@@ -64,6 +65,7 @@ module.exports = {
       _id: {
         type: "object",
       },
+      logo: { type: "string", nullable: true },
       vendorType: {
         type: "array",
         items: [

@@ -1,6 +1,22 @@
 const { Schema, model, Types } = require("mongoose");
-const denormalizedProductSchema = new Schema({});
-
+const denormalizedProductSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  productUnit: {
+    type: String,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  totalPrice: {
+    type: Number,
+    required: true,
+  },
+});
 
 const ProductSchema = new Schema(
   {
@@ -47,6 +63,7 @@ const ProductSchema = new Schema(
       type: [String],
       required: true,
       minlength: 1,
+      default: ["default.png"],
     },
     notes: {
       type: String,
@@ -54,6 +71,5 @@ const ProductSchema = new Schema(
   },
   { timestamps: true }
 );
-
 
 module.exports = model("Product", ProductSchema, "products");

@@ -40,6 +40,7 @@ const UserSchema = new Schema(
     },
     logo: {
       type: String,
+      default: "default.png",
     },
     password: {
       type: String,

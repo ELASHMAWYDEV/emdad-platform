@@ -9,6 +9,7 @@ const {
   SMTP_PORT,
   SMTP_USER,
   SMTP_PASS,
+  WEBSITE_URL,
 } = process.env;
 
 
@@ -21,6 +22,7 @@ if (!!!SMTP_HOST) throw new Error("SMTP_HOST is not configured in ENV");
 if (!!!SMTP_PORT) throw new Error("SMTP_PORT is not configured in ENV");
 if (!!!SMTP_USER) throw new Error("SMTP_USER is not configured in ENV");
 if (!!!SMTP_PASS) throw new Error("SMTP_PASS is not configured in ENV");
+if (!!!WEBSITE_URL) throw new Error("WEBSITE_URL is not configured in ENV");
 
 module.exports = {
   DB_URI,
@@ -32,4 +34,5 @@ module.exports = {
   SMTP_PORT,
   SMTP_USER,
   SMTP_PASS,
+  WEBSITE_URL,
 };

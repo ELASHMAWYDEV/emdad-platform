@@ -3,9 +3,6 @@ module.exports = {
     type: "object",
     additionalProperties: false,
     properties: {
-      fullData: {
-        type: "boolean",
-      },
       paginationToken: {
         type: ["string", "object"],
       },

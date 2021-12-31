@@ -1,5 +1,5 @@
 const UserModel = require("../../../../models/User");
-const FavourteModel = require("../../../../models/Favourite");
+const FavouriteModel = require("../../../../models/Favourite");
 const RatingModel = require("../../../../models/Rating");
 const ProductModel = require("../../../../models/Product");
 const { userTypes } = require("../../../../models/constants");
@@ -8,9 +8,10 @@ const { errorCodes } = require("../../../../errors");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas");
 const { Types } = require("mongoose");
+const { WEBSITE_URL } = require("../../../../globals");
 
 const listVendors = validateSchema(schemas.listVendorsSchema)(
-  async ({ fullData = false, paginationToken = null, searchQuery = "", vendorType = "", city = "", country = "" }) => {
+  async ({ paginationToken = null, searchQuery = "", vendorType = "", city = "", country = "" }) => {
     const vendors = await UserModel.find({
       userType: userTypes.VENDOR,
       ...(paginationToken && {
@@ -40,25 +41,10 @@ const listVendors = validateSchema(schemas.listVendorsSchema)(
       }),
     })
       .limit(10)
+      .select("-firebaseToken -password -userType")
       .lean();
 
-    // Delete sensitive attributes
-    vendors.forEach((v) => {
-      delete v.firebaseToken;
-      delete v.password;
-    });
-
-    if (vendors.length == 0) return [];
-
-    if (fullData) return vendors;
-    else
-      return vendors.map((s) => ({
-        _id: s._id,
-        oraganizationName: s.oraganizationName,
-        vendorType: s.vendorType,
-        city: s.city,
-        country: s.country,
-      }));
+    return vendors;
   }
 );
 
@@ -72,29 +58,43 @@ const getVendorRatings = async ({ vendorId, paginationToken = null }) => {
     targetId: vendorId,
   })
     .limit(10)
-    .populate({ path: "userId", select: "name country city" })
-    .lean();
-
+    .populate({ path: "userId", select: "name country city" });
   // Calculate the average
   const overAllRating = ratings?.reduce((curr, acc) => (curr + acc.rating) / 2, ratings[0]?.rating);
 
   return { ratings, overAllRating };
 };
 
-const getVendorProducts = async ({ vendorId, productType = null, paginationToken = null }) => {
+const getVendorProducts = async ({ vendorId, categorized = false, productType = [], paginationToken = null }) => {
   const products = await ProductModel.find({
     ...(paginationToken && {
       _id: {
         $gt: paginationToken,
       },
     }),
-    ...(productType && { productType }),
+    ...(productType.length !== 0 && { productType: { $in: productType } }),
     vendorId,
-  })
-    .limit(10)
-    .lean();
+  }).lean();
 
-  return products;
+  let productCategories;
+  if (categorized && productType.length === 0) {
+    productCategories = await ProductModel.find({
+      vendorId,
+    })
+      .distinct("productType")
+      .lean();
+
+    return {
+      categories: productCategories.map((category) => ({
+        category: category,
+        products: products
+          .filter((p) => p.productType.includes(category))
+          .map((p) => ({ ...p, images: p.images.map((img) => `${WEBSITE_URL}/images/products/${img}`) })),
+      })),
+    };
+  } else {
+    return { products: products.slice(0, 10) };
+  }
 };
 
 const getProductInfo = async (productId) => {
@@ -125,19 +125,27 @@ const getVendorInfo = async (vendorId) => {
 };
 
 const getFavouriteVendors = async (userId) => {
-  const favourites = await FavourteModel.findOne({
+  const favourites = await FavouriteModel.findOne({
     userId,
-  }).populate("favouriteVendors", "organizationName vendorType city country");
+  }).populate("favouriteVendors", "-firebaseToken -password -userType");
 
   return favourites?.favouriteVendors || [];
 };
 
-const addVendorToFavourites = async ({ vendorId, userId }) => {
-  await FavourteModel.findOneAndUpdate(
-    { userId },
-    { $addToSet: { favouriteVendors: new Types.ObjectId(vendorId) } },
-    { upsert: true }
-  );
+const toggleVendorToFavourites = async ({ vendorId, userId }) => {
+  // Check if exist in favourites list
+  const isExist = await FavouriteModel.findOne({ userId, favouriteVendors: { $in: [vendorId] } });
+
+  console.log(isExist);
+  if (isExist) await FavouriteModel.updateOne({ userId }, { $pull: { favouriteVendors: vendorId } });
+  else
+    await FavouriteModel.findOneAndUpdate(
+      { userId },
+      { $addToSet: { favouriteVendors: new Types.ObjectId(vendorId) } },
+      { upsert: true }
+    );
+
+  return !!isExist ? "تم حذف البائع من المفضلة بنجاح" : "تم اضافة البائع الي المفضلة بنجاح";
 };
 
 const rateTarget = validateSchema(schemas.rateTargetSchema)(async ({ targetId, userId, rating, comment }) => {
@@ -153,7 +161,7 @@ const rateTarget = validateSchema(schemas.rateTargetSchema)(async ({ targetId, u
 module.exports = {
   listVendors,
   getFavouriteVendors,
-  addVendorToFavourites,
+  toggleVendorToFavourites,
   getVendorInfo,
   getVendorRatings,
   getVendorProducts,
