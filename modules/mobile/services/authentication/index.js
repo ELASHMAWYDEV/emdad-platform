@@ -8,6 +8,7 @@ const {
   SMTP_PORT,
   SMTP_USER,
   SMTP_PASS,
+  WEBSITE_URL,
 } = require("../../../../globals");
 const twilioClient = require("twilio")(TWILIO_SID, TWILIO_TOKEN);
 const { errorCodes } = require("../../../../errors");
@@ -257,6 +258,9 @@ const loginUser = validateSchema(schemas.loginSchema)(async ({ user, password, f
     };
   }
 
+  // Set the logo url
+  if (userObject.logo) userObject.logo = `${WEBSITE_URL}/images/users/${userObject.logo}`;
+
   return {
     accessToken,
     user: userObject,
@@ -298,8 +302,10 @@ const registerNewUser = validateSchema(schemas.registrationSchema)(async (user) 
   });
 
   //Send OTP to the user
-  await sendOtp(userObject._id);
+  sendOtp(userObject._id);
 
+  // Set the logo url
+  if (userObject.logo) userObject.logo = `${WEBSITE_URL}/images/users/${userObject.logo}`;
   return {
     user: userObject,
     accessToken,
