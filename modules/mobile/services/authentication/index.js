@@ -280,14 +280,6 @@ const registerNewUser = validateSchema(schemas.registrationSchema)(async (user) 
       { key: "primaryPhoneNumber", message: "رقم الهاتف الاساسي مسجل من قبل" },
     ]);
 
-  if (
-    user.secondaryPhoneNumber &&
-    (await UserModel.findOne({ "secondaryPhoneNumber.number": user.secondaryPhoneNumber.number }))
-  )
-    throw new ApiError(errorCodes.DUPLICATION_ERROR, [
-      { key: "secondaryPhoneNumber", message: "رقم الهاتف الاساسي مسجل من قبل" },
-    ]);
-
   //Encrypt password
   const hashedPassword = await bcrypt.hash(user.password, 10);
 
