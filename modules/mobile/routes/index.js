@@ -38,7 +38,7 @@ router.post("/user/vendors/:vendorId/rate", checkToken, userMiddleware, userCont
 router.get("/user/vendors/:vendorId/products", checkToken, userMiddleware, userController.getVendorProducts);
 router.get("/user/vendors/products/:productId", checkToken, userMiddleware, userController.getProductInfo);
 
-router.put("/user/supplyRequests", checkToken, userMiddleware, tempResponse);
+router.put("/user/supplyRequests", checkToken, userMiddleware, userController.createSupplyRequest);
 router.post("/user/supplyRequests/:supplyRequestId/resend", checkToken, userMiddleware, tempResponse);
 router.post("/user/supplyRequests/:supplyRequestId/rate", checkToken, userMiddleware, tempResponse);
 router.get("/user/supplyRequests", checkToken, userMiddleware, tempResponse);

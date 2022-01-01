@@ -14,7 +14,7 @@ const denormalizedProductSchema = new Schema({
   },
   totalPrice: {
     type: Number,
-    required: true,
+    default: null,
   },
 });
 
@@ -73,3 +73,4 @@ const ProductSchema = new Schema(
 );
 
 module.exports = model("Product", ProductSchema, "products");
+module.exports.denormalizedProductSchema = denormalizedProductSchema;

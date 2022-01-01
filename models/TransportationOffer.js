@@ -2,22 +2,22 @@ const { Schema, model, Types } = require("mongoose");
 
 const TransportationOfferSchema = new Schema(
   {
-    supplyOfferId: {
+    transporterId: {
       type: Types.ObjectId,
-      ref: "SupplyOffer",
+      ref: "User",
+      required: true,
+    },
+    supplyRequestId: {
+      type: Types.ObjectId,
+      ref: "SupplyRequest",
       required: true,
     },
     price: {
-      type: {
-        beforeTax: Number,
-        afterTax: Number,
-      },
+      type: Number,
+      required: true,
     },
     tax: {
-      type: {
-        percantage: Number,
-        value: Number,
-      },
+      type: Number,
     },
     notes: {
       type: String,

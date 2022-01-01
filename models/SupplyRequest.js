@@ -1,15 +1,15 @@
 const { Schema, model, Types } = require("mongoose");
+const { supplyRequestStatus, userTypes } = require("./constants");
+const { denormalizedProductSchema } = require("./Product");
 
-const pointSchema = new Schema({
-  type: {
+const AdditionalItemSchema = new Schema({
+  description: {
     type: String,
-    enum: ["Point"],
     required: true,
-    default: "Point",
   },
-  coordinates: {
-    type: [Number],
-    required: true,
+  price: {
+    type: Number,
+    default: null,
   },
 });
 
@@ -23,10 +23,32 @@ const SupplyRequestSchema = new Schema(
     vendorId: {
       type: Types.ObjectId,
       ref: "User",
+      default: null,
     },
-    transportationMethod: {
+    requestStatus: {
       type: String,
-    }, //Assigned after the offer is accepted
+      required: true,
+      enum: Object.values(supplyRequestStatus),
+      default: supplyRequestStatus.AWAITING_QUOTATION,
+    },
+    transportationHandler: {
+      type: String,
+      required: true,
+      enum: Object.values(userTypes),
+    },
+    transportationRequestId: {
+      type: Types.ObjectId,
+      ref: "TransportationRequest",
+      default: null,
+    },
+    requestItems: [denormalizedProductSchema],
+    additionalItems: [AdditionalItemSchema],
+    transportationPrice: {
+      type: Number,
+    },
+    totalRequestPriceWithTax: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );

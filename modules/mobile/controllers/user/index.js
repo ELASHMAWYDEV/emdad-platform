@@ -1,5 +1,6 @@
 const UserService = require("../../services/user");
 const SettingsService = require("../../services/settings");
+const SupplyService = require("../../services/supply");
 
 const getHomeData = async (req, res, next) => {
   try {
@@ -115,6 +116,22 @@ const rateVendor = async (req, res, next) => {
   }
 };
 
+const createSupplyRequest = async (req, res, next) => {
+  try {
+    const supplyRequest = req.body;
+    console.log({ ...supplyRequest, userId: req.user._id });
+    const result = await SupplyService.createSupplyRequest({ ...supplyRequest, userId: req.user._id });
+
+    return res.json({
+      status: true,
+      message: "تم ارسال الطلب بنجاح",
+      data: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   getHomeData,
   getListOfVendors,
@@ -123,4 +140,5 @@ module.exports = {
   getProductInfo,
   addVendorToFavourites,
   rateVendor,
+  createSupplyRequest,
 };

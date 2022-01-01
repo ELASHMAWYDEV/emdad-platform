@@ -102,7 +102,7 @@ const getProductInfo = async (productId) => {
 
   if (!product) throw new ApiError(errorCodes.PRODUCT_NOT_FOUND);
 
-  return product;
+  return { ...product, images: product?.images?.map((img) => `${WEBSITE_URL}/images/products/${img}`) };
 };
 
 const getVendorInfo = async (vendorId) => {
