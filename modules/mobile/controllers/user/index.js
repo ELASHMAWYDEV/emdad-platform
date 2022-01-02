@@ -1,6 +1,7 @@
 const UserService = require("../../services/user");
 const SettingsService = require("../../services/settings");
 const SupplyService = require("../../services/supply");
+const ProductService = require("../../services/product");
 
 const getHomeData = async (req, res, next) => {
   try {
@@ -58,7 +59,7 @@ const getVendorProducts = async (req, res, next) => {
   try {
     const { vendorId } = req.params;
     const filters = req.query;
-    const result = await UserService.getVendorProducts({ vendorId, ...filters, categorized: true });
+    const result = await ProductService.listProducts({ vendorId, ...filters, categorized: true });
 
     return res.json({
       status: true,
@@ -78,7 +79,7 @@ const getProductInfo = async (req, res, next) => {
     return res.json({
       status: true,
       message: "تم استرجاع البيانات بنجاح",
-      data: result,
+      data: { product: result },
     });
   } catch (e) {
     next(e);
@@ -109,7 +110,7 @@ const rateVendor = async (req, res, next) => {
     return res.json({
       status: true,
       message: "تم تقييم البائع بنجاح",
-      data: result,
+      data: { rating: result },
     });
   } catch (e) {
     next(e);
@@ -119,13 +120,58 @@ const rateVendor = async (req, res, next) => {
 const createSupplyRequest = async (req, res, next) => {
   try {
     const supplyRequest = req.body;
-    console.log({ ...supplyRequest, userId: req.user._id });
     const result = await SupplyService.createSupplyRequest({ ...supplyRequest, userId: req.user._id });
 
     return res.json({
       status: true,
       message: "تم ارسال الطلب بنجاح",
-      data: result,
+      data: { supplyRequest: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const resendSupplyRequest = async (req, res, next) => {
+  try {
+    const supplyRequest = req.body;
+    const { supplyRequestId } = req.params;
+    const result = await SupplyService.resendSupplyRequest({ ...supplyRequest, supplyRequestId });
+
+    return res.json({
+      status: true,
+      message: "تم اعادة ارسال الطلب بنجاح",
+      data: { supplyRequest: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const listSupplyRequests = async (req, res, next) => {
+  try {
+    const { paginationToken } = req.query;
+    const result = await SupplyService.listSupplyRequests({ userId: req.user._id, paginationToken });
+
+    return res.json({
+      status: true,
+      message: "تم استرجاع البيانات بنجاح",
+      data: { supplyRequests: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const getSupplyRequestInfo = async (req, res, next) => {
+  try {
+    const { supplyRequestId } = req.params;
+    const result = await SupplyService.getSupplyRequestInfo(supplyRequestId);
+
+    return res.json({
+      status: true,
+      message: "تم استرجاع البيانات بنجاح",
+      data: { supplyRequest: result },
     });
   } catch (e) {
     next(e);
@@ -141,4 +187,7 @@ module.exports = {
   addVendorToFavourites,
   rateVendor,
   createSupplyRequest,
+  resendSupplyRequest,
+  listSupplyRequests,
+  getSupplyRequestInfo,
 };

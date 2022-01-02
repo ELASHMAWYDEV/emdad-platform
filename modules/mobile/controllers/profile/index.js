@@ -11,7 +11,7 @@ const completeProfile = async (req, res, next) => {
     return res.json({
       status: true,
       message: "تم تحديث  بيانات حسابك بنجاح وهو الأن مفعل",
-      data: result,
+      data: { user: result },
     });
   } catch (e) {
     next(e);
@@ -30,7 +30,7 @@ const editProfile = async (req, res, next) => {
     return res.json({
       status: true,
       message: "تم تعديل  بيانات حسابك بنجاح",
-      data: result,
+      data: { user: result },
     });
   } catch (e) {
     next(e);
@@ -40,7 +40,7 @@ const editProfile = async (req, res, next) => {
 const editPassword = async (req, res, next) => {
   try {
     const passwords = req.body;
-    const result = await ProfileService.editUserPassword({
+    await ProfileService.editUserPassword({
       ...passwords,
       _id: req.user._id,
     });
@@ -48,7 +48,7 @@ const editPassword = async (req, res, next) => {
     return res.json({
       status: true,
       message: "تم تعديل  كلمة مرور حسابك بنجاح",
-      data: result,
+      data: null,
     });
   } catch (e) {
     next(e);
@@ -58,7 +58,7 @@ const editPassword = async (req, res, next) => {
 const editEmail = async (req, res, next) => {
   try {
     const { email } = req.body;
-    const result = await ProfileService.editUserEmail({
+    await ProfileService.editUserEmail({
       email,
       _id: req.user._id,
     });
@@ -66,7 +66,7 @@ const editEmail = async (req, res, next) => {
     return res.json({
       status: true,
       message: "تم تعديل  بريدك الالكتروني بنجاح",
-      data: result,
+      data: null,
     });
   } catch (e) {
     next(e);

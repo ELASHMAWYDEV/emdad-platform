@@ -2,6 +2,7 @@ const UserModel = require("../../../../models/User");
 const FavouriteModel = require("../../../../models/Favourite");
 const RatingModel = require("../../../../models/Rating");
 const ProductModel = require("../../../../models/Product");
+const ProductService = require("../product");
 const { userTypes } = require("../../../../models/constants");
 const ApiError = require("../../../../errors/ApiError");
 const { errorCodes } = require("../../../../errors");
@@ -65,38 +66,6 @@ const getVendorRatings = async ({ vendorId, paginationToken = null }) => {
   return { ratings, overAllRating };
 };
 
-const getVendorProducts = async ({ vendorId, categorized = false, productType = [], paginationToken = null }) => {
-  const products = await ProductModel.find({
-    ...(paginationToken && {
-      _id: {
-        $gt: paginationToken,
-      },
-    }),
-    ...(productType.length !== 0 && { productType: { $in: productType } }),
-    vendorId,
-  }).lean();
-
-  let productCategories;
-  if (categorized && productType.length === 0) {
-    productCategories = await ProductModel.find({
-      vendorId,
-    })
-      .distinct("productType")
-      .lean();
-
-    return {
-      categories: productCategories.map((category) => ({
-        category: category,
-        products: products
-          .filter((p) => p.productType.includes(category))
-          .map((p) => ({ ...p, images: p.images.map((img) => `${WEBSITE_URL}/images/products/${img}`) })),
-      })),
-    };
-  } else {
-    return { products: products.slice(0, 10) };
-  }
-};
-
 const getProductInfo = async (productId) => {
   const product = await ProductModel.findOne({ _id: new Types.ObjectId(productId) }).lean();
 
@@ -115,7 +84,7 @@ const getVendorInfo = async (vendorId) => {
   const { ratings, overAllRating } = await getVendorRatings({ vendorId });
 
   // Get vendor products
-  const products = await getVendorProducts({ vendorId });
+  const products = await ProductService.listProducts({ vendorId });
   return {
     vendorInfo,
     ratings,
@@ -164,7 +133,6 @@ module.exports = {
   toggleVendorToFavourites,
   getVendorInfo,
   getVendorRatings,
-  getVendorProducts,
   getProductInfo,
   rateTarget,
 };

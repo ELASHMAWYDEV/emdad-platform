@@ -52,7 +52,7 @@ module.exports = {
       },
     },
   },
-  quoteSupplyRequestSchema: {
+  resendSupplyRequestSchema: {
     type: "object",
     required: ["supplyRequestId", "requestItems"],
     additionalProperties: false,
@@ -62,13 +62,64 @@ module.exports = {
       },
       requestItems: {
         type: "array",
+        minItems: 1,
         items: [
           {
             type: "object",
-            required: ["productId", "totalPrice"],
+            required: ["name", "quantity", "productUnit"],
             additionalProperties: false,
             properties: {
-              productId: {
+              name: {
+                type: "string",
+              },
+              quantity: {
+                type: "number",
+              },
+              productUnit: {
+                type: "string",
+              },
+            },
+          },
+        ],
+      },
+      additionalItems: {
+        type: "array",
+        minItems: 0,
+        items: [
+          {
+            type: "object",
+            required: ["description"],
+            properties: {
+              description: {
+                type: "string",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+  quoteSupplyRequestSchema: {
+    type: "object",
+    required: ["vendorId", "supplyRequestId", "requestItems"],
+    additionalProperties: false,
+    properties: {
+      vendorId: {
+        type: ["object", "string"],
+      },
+      supplyRequestId: {
+        type: "string",
+      },
+      requestItems: {
+        type: "array",
+        minItems: 0,
+        items: [
+          {
+            type: "object",
+            required: ["itemId", "totalPrice"],
+            additionalProperties: false,
+            properties: {
+              itemId: {
                 type: "string",
               },
               totalPrice: {
@@ -80,6 +131,7 @@ module.exports = {
       },
       additionalItems: {
         type: "array",
+        minItems: 0,
         items: [
           {
             type: "object",
