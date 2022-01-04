@@ -2,11 +2,13 @@ const ProductModel = require("../../../../models/Product");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas.js");
 const { WEBSITE_URL } = require("../../../../globals");
+const CustomError = require("../../../../errors/CustomError");
 
 const addProduct = validateSchema(schemas.addProductSchema)(async (product) => {
   // Validation on images
   for (let image of product.images) {
-    if (!/\w+-\w+-\w+-\w+-\w+\.\w+/.test(image)) throw new Error("الصور التي ارسلتها  لم تقم برفعها كلها");
+    if (!/\w+-\w+-\w+-\w+-\w+\.\w+/.test(image))
+      throw new CustomError("NOT_ALL_IMAGES_UPLOADED", "الصور التي ارسلتها  لم تقم برفعها كلها");
   }
 
   const createdProduct = await ProductModel.create(product);
@@ -48,7 +50,7 @@ const listProducts = async ({ vendorId, categorized = false, productType = [], p
 
 const getProductDetails = async (productId) => {
   const product = await ProductModel.findOne({ _id: productId });
-  if (!product) throw new Error("المنتج الذي تحاول الوصول اليه غير موجود");
+  if (!product) throw new CustomError("PRODUCT_NOT_FOUND", "المنتج الذي تحاول الوصول اليه غير موجود");
 
   return product;
 };
@@ -56,5 +58,5 @@ const getProductDetails = async (productId) => {
 module.exports = {
   addProduct,
   listProducts,
-  getProductDetails
+  getProductDetails,
 };

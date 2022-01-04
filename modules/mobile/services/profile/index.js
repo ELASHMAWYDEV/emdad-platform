@@ -5,11 +5,12 @@ const UserModel = require("../../../../models/User");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas.js");
 const { WEBSITE_URL } = require("../../../../globals");
+const CustomError = require("../../../../errors/CustomError");
 
 const completeUserProfile = validateSchema(schemas.completeProfileSchema)(async ({ _id, location, ...user }) => {
   // Validation on logo
   if (user.logo && !/\w+-\w+-\w+-\w+-\w+\.\w+/.test(user.logo))
-    throw new Error("الصورة التي ارسلتها  لم تقم برفعها من قبل");
+    throw new CustomError("IMAGES_NOT_CORRECT", "الصورة التي ارسلتها  لم تقم برفعها من قبل");
 
   //Check if user already updated his profile
   if (
@@ -46,7 +47,7 @@ const completeUserProfile = validateSchema(schemas.completeProfileSchema)(async 
 const editUserProfile = validateSchema(schemas.editProfileSchema)(async ({ _id, location, ...user }) => {
   // Validation on logo
   if (user.logo && !/\w+-\w+-\w+-\w+-\w+\.\w+/.test(user.logo))
-    throw new Error("الصورة التي ارسلتها  لم تقم برفعها من قبل");
+    throw new CustomError("IMAGES_NOT_UPLOADED", "الصورة التي ارسلتها  لم تقم برفعها من قبل");
 
   await UserModel.updateOne(
     {

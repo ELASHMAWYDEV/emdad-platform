@@ -2,6 +2,7 @@ const { v4: uuid4 } = require("uuid");
 const path = require("path");
 const ApiError = require("../../../../errors/ApiError");
 const { errorCodes } = require("../../../../errors");
+const CustomError = require("../../../../errors/CustomError");
 
 const uploadImages = ({ type, files }) => {
   let { logo, images } = files || { logo: {}, images: {} };
@@ -12,7 +13,7 @@ const uploadImages = ({ type, files }) => {
 
   switch (type) {
     case "users":
-      if (Array.isArray(logo)) throw new Error("يجب رفع صورة واحدة فقط");
+      if (Array.isArray(logo)) throw new CustomError("ONE_IMAGE_ONLY","يجب رفع صورة واحدة فقط");
       logo.extension = logo.name.split(".").pop();
       logo.uniqueName = `${uuid4()}.${logo.extension}`;
       if (!["jpg", "png", "jpeg"].includes(logo.extension)) throw new ApiError(errorCodes.IMAGE_TYPE_NOT_SUPPORTED);

@@ -148,6 +148,21 @@ const resendSupplyRequest = async (req, res, next) => {
   }
 };
 
+const acceptSupplyRequest = async (req, res, next) => {
+  try {
+    const { supplyRequestId } = req.params;
+    const result = await SupplyService.acceptSupplyRequest(supplyRequestId);
+
+    return res.json({
+      status: true,
+      message: "تمت الموافقة علي عرض السعر بنجاح",
+      data: { supplyRequest: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const listSupplyRequests = async (req, res, next) => {
   try {
     const { paginationToken } = req.query;
@@ -190,4 +205,5 @@ module.exports = {
   resendSupplyRequest,
   listSupplyRequests,
   getSupplyRequestInfo,
+  acceptSupplyRequest
 };

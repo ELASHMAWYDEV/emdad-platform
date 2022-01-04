@@ -46,7 +46,12 @@ router.post(
   userMiddleware,
   userController.resendSupplyRequest
 );
-router.post("/user/supplyRequests/:supplyRequestId/rate", checkToken, userMiddleware, tempResponse);
+router.post(
+  "/user/supplyRequests/:supplyRequestId/accept",
+  checkToken,
+  userMiddleware,
+  userController.acceptSupplyRequest
+);
 router.get("/user/supplyRequests", checkToken, userMiddleware, userController.listSupplyRequests);
 
 router.get("/user/supplyOffers", checkToken, userMiddleware, tempResponse);

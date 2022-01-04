@@ -110,6 +110,9 @@ module.exports = {
       supplyRequestId: {
         type: "string",
       },
+      transportationPrice: {
+        type: "number",
+      },
       requestItems: {
         type: "array",
         minItems: 0,

@@ -19,6 +19,7 @@ const { createToken } = require("../../../../middlewares/jwt");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas");
 const ApiError = require("../../../../errors/ApiError");
+const CustomError = require("../../../../errors/CustomError");
 
 const checkPhoneNumber = ({ countryCode, number }) => {
   switch (countryCode) {
@@ -63,7 +64,7 @@ const checkPhoneNumber = ({ countryCode, number }) => {
 const sendOtp = async (userId, type) => {
   const userSearch = await UserModel.findById(userId);
 
-  if (!userSearch) throw new Error(`The user is with ID: ${userId} is not registered`);
+  if (!userSearch) throw new CustomError(`The user is with ID: ${userId} is not registered`);
 
   const { primaryPhoneNumber, primaryEmail } = userSearch;
 

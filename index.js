@@ -56,8 +56,8 @@ app.get("/images/:path/:image", (req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err instanceof ApiError) {
-    // API Error
-    return sendErrorResponse(res, new ApiError(err.errorCode, err.details));
+    // API or Custom Error
+    return sendErrorResponse(res, err);
   } else if (err.code == 11000) {
     // Duplication Error
     return sendErrorResponse(
