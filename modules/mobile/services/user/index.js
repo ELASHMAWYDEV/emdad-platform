@@ -11,8 +11,53 @@ const schemas = require("./schemas");
 const { Types } = require("mongoose");
 const { WEBSITE_URL } = require("../../../../globals");
 
+const listTransporters = validateSchema(schemas.listTransportersSchema)(
+  async ({
+    paginationToken = null,
+    limit = 10,
+    searchQuery = "",
+    transportationMethods = [],
+    city = "",
+    country = "",
+  }) => {
+    const vendors = await UserModel.find({
+      userType: userTypes.TRANSPORTER,
+      ...(paginationToken && {
+        _id: {
+          $gt: paginationToken,
+        },
+      }),
+      ...(searchQuery && {
+        oraganizationName: {
+          $regex: ".*" + searchQuery + ".*",
+        },
+      }),
+      ...(transportationMethods && {
+        transportationMethods: {
+          $in: transportationMethods,
+        },
+      }),
+      ...(city && {
+        city: {
+          $regex: ".*" + city + ".*",
+        },
+      }),
+      ...(country && {
+        country: {
+          $regex: ".*" + country + ".*",
+        },
+      }),
+    })
+      .limit(limit)
+      .select("-password")
+      .lean();
+
+    return vendors;
+  }
+);
+
 const listVendors = validateSchema(schemas.listVendorsSchema)(
-  async ({ paginationToken = null, searchQuery = "", vendorType = "", city = "", country = "" }) => {
+  async ({ paginationToken = null, limit = 10, searchQuery = "", vendorType = [], city = "", country = "" }) => {
     const vendors = await UserModel.find({
       userType: userTypes.VENDOR,
       ...(paginationToken && {
@@ -41,7 +86,7 @@ const listVendors = validateSchema(schemas.listVendorsSchema)(
         },
       }),
     })
-      .limit(10)
+      .limit(limit)
       .select("-firebaseToken -password -userType")
       .lean();
 
@@ -59,32 +104,49 @@ const getVendorRatings = async ({ vendorId, paginationToken = null }) => {
     targetId: vendorId,
   })
     .limit(10)
-    .populate({ path: "userId", select: "name country city" });
+    .populate({
+      path: "userId",
+      select: "name country city",
+    });
   // Calculate the average
   const overAllRating = ratings?.reduce((curr, acc) => (curr + acc.rating) / 2, ratings[0]?.rating);
 
-  return { ratings, overAllRating };
+  return {
+    ratings,
+    overAllRating,
+  };
 };
 
 const getProductInfo = async (productId) => {
-  const product = await ProductModel.findOne({ _id: new Types.ObjectId(productId) }).lean();
+  const product = await ProductModel.findOne({
+    _id: new Types.ObjectId(productId),
+  }).lean();
 
   if (!product) throw new ApiError(errorCodes.PRODUCT_NOT_FOUND);
 
-  return { ...product, images: product?.images?.map((img) => `${WEBSITE_URL}/images/products/${img}`) };
+  return {
+    ...product,
+    images: product?.images?.map((img) => `${WEBSITE_URL}/images/products/${img}`),
+  };
 };
 
 const getVendorInfo = async (vendorId) => {
   // Get the vendor data
-  const vendorInfo = await UserModel.findOne({ _id: vendorId }).lean();
+  const vendorInfo = await UserModel.findOne({
+    _id: vendorId,
+  }).lean();
   delete vendorInfo.firebaseToken;
   delete vendorInfo.password;
 
   // Get vendor ratings
-  const { ratings, overAllRating } = await getVendorRatings({ vendorId });
+  const { ratings, overAllRating } = await getVendorRatings({
+    vendorId,
+  });
 
   // Get vendor products
-  const products = await ProductService.listProducts({ vendorId });
+  const products = await ProductService.listProducts({
+    vendorId,
+  });
   return {
     vendorInfo,
     ratings,
@@ -103,15 +165,38 @@ const getFavouriteVendors = async (userId) => {
 
 const toggleVendorToFavourites = async ({ vendorId, userId }) => {
   // Check if exist in favourites list
-  const isExist = await FavouriteModel.findOne({ userId, favouriteVendors: { $in: [vendorId] } });
+  const isExist = await FavouriteModel.findOne({
+    userId,
+    favouriteVendors: {
+      $in: [vendorId],
+    },
+  });
 
   console.log(isExist);
-  if (isExist) await FavouriteModel.updateOne({ userId }, { $pull: { favouriteVendors: vendorId } });
+  if (isExist)
+    await FavouriteModel.updateOne(
+      {
+        userId,
+      },
+      {
+        $pull: {
+          favouriteVendors: vendorId,
+        },
+      }
+    );
   else
     await FavouriteModel.findOneAndUpdate(
-      { userId },
-      { $addToSet: { favouriteVendors: new Types.ObjectId(vendorId) } },
-      { upsert: true }
+      {
+        userId,
+      },
+      {
+        $addToSet: {
+          favouriteVendors: new Types.ObjectId(vendorId),
+        },
+      },
+      {
+        upsert: true,
+      }
     );
 
   return !!isExist ? "تم حذف البائع من المفضلة بنجاح" : "تم اضافة البائع الي المفضلة بنجاح";
@@ -119,9 +204,20 @@ const toggleVendorToFavourites = async ({ vendorId, userId }) => {
 
 const rateTarget = validateSchema(schemas.rateTargetSchema)(async ({ targetId, userId, rating, comment }) => {
   const ratingResult = await RatingModel.findOneAndUpdate(
-    { userId, targetId },
-    { $set: { rating, comment } },
-    { upsert: true, new: true }
+    {
+      userId,
+      targetId,
+    },
+    {
+      $set: {
+        rating,
+        comment,
+      },
+    },
+    {
+      upsert: true,
+      new: true,
+    }
   );
 
   return ratingResult;
@@ -129,6 +225,7 @@ const rateTarget = validateSchema(schemas.rateTargetSchema)(async ({ targetId, u
 
 module.exports = {
   listVendors,
+  listTransporters,
   getFavouriteVendors,
   toggleVendorToFavourites,
   getVendorInfo,

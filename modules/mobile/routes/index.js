@@ -3,6 +3,7 @@ const router = express.Router();
 
 //middlewares
 const { checkToken } = require("../../../middlewares/jwt");
+const guestMiddleware = require("../../../middlewares/guestMiddleware");
 const userMiddleware = require("../../../middlewares/userMiddleware");
 const vendorMiddleware = require("../../../middlewares/vendorMiddleware");
 const transporterMiddleware = require("../../../middlewares/transporterMiddleware");
@@ -12,6 +13,7 @@ const authenticationController = require("../controllers/authentication");
 const profileController = require("../controllers/profile");
 const userController = require("../controllers/user");
 const vendorController = require("../controllers/vendor");
+const transporterController = require("../controllers/transporter");
 const settingsController = require("../controllers/settings");
 
 const tempResponse = (req, res) => res.send("Not Working Yet");
@@ -21,6 +23,7 @@ router.post("/auth/login", authenticationController.login);
 router.post("/auth/register", authenticationController.register);
 router.post("/auth/otp", checkToken, authenticationController.verifyOtp);
 router.post("/auth/otp/resend", checkToken, authenticationController.resendOtp);
+router.post("/auth/registerGuest", authenticationController.registerGuest);
 
 // Profile
 router.post("/profile/complete", checkToken, profileController.completeProfile);
@@ -29,14 +32,26 @@ router.post("/profile/password", checkToken, profileController.editPassword);
 router.post("/profile/email", checkToken, profileController.editEmail);
 
 //User
-router.get("/user/home", checkToken, userMiddleware, userController.getHomeData);
+router.get("/user/home", checkToken, guestMiddleware, userMiddleware, userController.getHomeData);
 
-router.get("/user/vendors", checkToken, userMiddleware, userController.getListOfVendors);
-router.get("/user/vendors/:vendorId", checkToken, userMiddleware, userController.getVendorInfo);
-router.post("/user/vendors/:vendorId/favourite", checkToken, userMiddleware, userController.addVendorToFavourites);
+router.get("/user/vendors", checkToken, guestMiddleware, userMiddleware, userController.getListOfVendors);
+router.get("/user/vendors/:vendorId", checkToken, guestMiddleware, userMiddleware, userController.getVendorInfo);
+router.post("/user/vendors/:vendorId/favourite", checkToken, userMiddleware, userController.toggleVendorToFavourites);
 router.post("/user/vendors/:vendorId/rate", checkToken, userMiddleware, userController.rateVendor);
-router.get("/user/vendors/:vendorId/products", checkToken, userMiddleware, userController.getVendorProducts);
-router.get("/user/vendors/products/:productId", checkToken, userMiddleware, userController.getProductInfo);
+router.get(
+  "/user/vendors/:vendorId/products",
+  checkToken,
+  guestMiddleware,
+  userMiddleware,
+  userController.getVendorProducts
+);
+router.get(
+  "/user/vendors/products/:productId",
+  checkToken,
+  guestMiddleware,
+  userMiddleware,
+  userController.getProductInfo
+);
 
 router.put("/user/supplyRequests", checkToken, userMiddleware, userController.createSupplyRequest);
 router.get("/user/supplyRequests/:supplyRequestId", checkToken, userMiddleware, userController.getSupplyRequestInfo);
@@ -54,14 +69,23 @@ router.post(
 );
 router.get("/user/supplyRequests", checkToken, userMiddleware, userController.listSupplyRequests);
 
-router.get("/user/supplyOffers", checkToken, userMiddleware, tempResponse);
-router.get("/user/supplyOffers/:supplyOfferId", checkToken, userMiddleware, tempResponse);
-router.post("/user/supplyOffers/:supplyOfferId/pay", checkToken, userMiddleware, tempResponse);
-router.get("/user/supplyOffers/paymentStatus/success", checkToken, userMiddleware, tempResponse);
-router.get("/user/supplyOffers/paymentStatus/failure", checkToken, userMiddleware, tempResponse);
+// router.get("/user/supplyRequests/paymentStatus/success", checkToken, userMiddleware, tempResponse);
+// router.get("/user/supplyRequests/paymentStatus/failure", checkToken, userMiddleware, tempResponse);
 
-router.put("/user/transportationRequests", checkToken, userMiddleware, tempResponse);
-router.get("/user/transportationRequests", checkToken, userMiddleware, tempResponse);
+router.put("/user/transportationRequests", checkToken, userMiddleware, userController.createTransportationRequest);
+router.get(
+  "/user/transportationRequests/:transportationRequestId/transportationOffers",
+  checkToken,
+  userMiddleware,
+  vendorController.listTransportationOffers
+);
+router.post(
+  "/user/transportationOffers/:transportationOfferId",
+  checkToken,
+  userMiddleware,
+  userController.acceptTransportationOffer
+);
+// router.get("/user/transportationRequests", checkToken, userMiddleware, tempResponse);
 router.get("/user/transportationRequests/:transportationRequestId", checkToken, userMiddleware, tempResponse);
 router.post("/user/transportationRequests/:transportationRequestId/resend", checkToken, userMiddleware, tempResponse);
 
@@ -86,13 +110,27 @@ router.get(
   vendorController.getSupplyRequestInfo
 );
 
-router.post("/vendor/transportationRequests", checkToken, tempResponse);
-router.get("/vendor/transportationOffers", checkToken, tempResponse);
-router.get("/vendor/transportationOffers/:transportationOfferId", checkToken, tempResponse);
-router.post("/vendor/transportationOffers/:transportationOfferId/accept", checkToken, tempResponse);
-router.post("/vendor/transportationOffers/:transportationOfferId/pay", checkToken, tempResponse);
-router.get("/vendor/transportationOffers/paymentStatus/success", checkToken, tempResponse);
-router.get("/vendor/transportationOffers/paymentStatus/failure", checkToken, tempResponse);
+router.put(
+  "/vendor/transportationRequests",
+  checkToken,
+  vendorMiddleware,
+  vendorController.createTransportationRequest
+);
+router.get(
+  "/vendor/transportationRequests/:transportationRequestId/transportationOffers",
+  checkToken,
+  vendorMiddleware,
+  vendorController.listTransportationOffers
+);
+router.post(
+  "/vendor/transportationOffers/:transportationOfferId",
+  checkToken,
+  vendorMiddleware,
+  vendorController.acceptTransportationOffer
+);
+router.post("/vendor/transportationOffers/:transportationOfferId/pay", checkToken, vendorMiddleware, tempResponse);
+router.get("/vendor/transportationOffers/paymentStatus/success", checkToken, vendorMiddleware, tempResponse);
+router.get("/vendor/transportationOffers/paymentStatus/failure", checkToken, vendorMiddleware, tempResponse);
 
 router.put("/vendor/products", checkToken, vendorMiddleware, vendorController.addProduct);
 router.get("/vendor/products", checkToken, vendorMiddleware, vendorController.listProducts);
@@ -100,10 +138,36 @@ router.get("/vendor/products/:productId", checkToken, vendorMiddleware, vendorCo
 router.post("/vendor/products/:productId", checkToken, vendorMiddleware, tempResponse);
 
 //Transporter
-router.get("/transporter/transportationRequests", checkToken, tempResponse);
-router.get("/transporter/transportationRequests/:transportationRequestId", checkToken, tempResponse);
-router.post("/transporter/transportationRequests/:transportationRequestId/changeStatus", checkToken, tempResponse);
-router.post("/transporter/transportationOffers", checkToken, tempResponse);
+router.get(
+  "/transporter/transportationRequests",
+  checkToken,
+  transporterMiddleware,
+  transporterController.listTransportationRequests
+);
+router.get(
+  "/transporter/transportationOrders",
+  checkToken,
+  transporterMiddleware,
+  transporterController.listAcceptedTransportationRequests
+);
+router.get(
+  "/transporter/transportationRequests/:transportationRequestId",
+  checkToken,
+  transporterMiddleware,
+  transporterController.getTransportationRequestDetails
+);
+router.post(
+  "/transporter/transportationRequests/:transportationRequestId/changeStatus",
+  checkToken,
+  transporterMiddleware,
+  tempResponse
+);
+router.put(
+  "/transporter/transportationOffers",
+  checkToken,
+  transporterMiddleware,
+  transporterController.createTransportationOffer
+);
 
 //Global
 router.get("/settings", settingsController.liseSettings);

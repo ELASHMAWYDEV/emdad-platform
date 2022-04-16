@@ -1,5 +1,5 @@
 const { Schema, model, Types } = require("mongoose");
-const { supplyRequestStatus, userTypes } = require("./constants");
+const { supplyRequestStatus, userTypes, paymentStatus } = require("./constants");
 const { denormalizedProductSchema } = require("./Product");
 
 const AdditionalItemSchema = new Schema({
@@ -15,6 +15,11 @@ const AdditionalItemSchema = new Schema({
 
 const SupplyRequestSchema = new Schema(
   {
+    generatedId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     userId: {
       type: Types.ObjectId,
       ref: "User",
@@ -47,6 +52,14 @@ const SupplyRequestSchema = new Schema(
       type: Number,
     },
     totalRequestPriceWithTax: {
+      type: Number,
+    },
+    paymentStatus: {
+      type: String,
+      enum: Object.values(paymentStatus),
+      default: paymentStatus.UNPAID,
+    },
+    estimationInSeconds: {
       type: Number,
     },
   },

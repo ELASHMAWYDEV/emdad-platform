@@ -2,13 +2,12 @@ const Ajv = require("ajv");
 const AjvError = require("../errors/AjvError");
 const localize = require("ajv-i18n");
 const addFormat = require("ajv-formats");
-const {
-  supportedLanguages
-} = require("../models/constants");
+const { supportedLanguages } = require("../models/constants");
 
 const ajv = new Ajv({
   allErrors: true,
-  messages: false
+  messages: false,
+  strict: false,
 });
 addFormat(ajv);
 
@@ -27,5 +26,5 @@ const validateSchema =
   };
 
 module.exports = {
-  validateSchema
+  validateSchema,
 };

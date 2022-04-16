@@ -86,9 +86,26 @@ const resendOtp = async (req, res, next) => {
   }
 };
 
+const registerGuest = async (req, res, next) => {
+  try {
+    const result = await authenticationService.registerGuest();
+
+    return res.json({
+      status: true,
+      message: "انت تتصفح التطبيق كزائر الأن",
+      data: {
+        accessToken: result.accessToken,
+      },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   login,
   register,
   verifyOtp,
   resendOtp,
+  registerGuest,
 };

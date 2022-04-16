@@ -13,7 +13,6 @@ module.exports = (req, res, next) => {
     next();
 
   } catch (e) {
-    console.log(e);
-    return next();
+    return next(e);
   }
 }

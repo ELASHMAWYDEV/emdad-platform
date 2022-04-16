@@ -5,7 +5,7 @@ const {
 module.exports = (req, res, next) => {
   try {
 
-    if (req.user && req.user.userType != userTypes.USER) return res.json({
+    if (req.user && req.user.userType != userTypes.TRANSPORTER) return res.json({
       status: false,
       message: "انت لست شركة توصيل ، يجب تسجيل الدخول كشركة توصيل اولا"
     });
@@ -13,7 +13,6 @@ module.exports = (req, res, next) => {
     next();
 
   } catch (e) {
-    console.log(e);
-    return next();
+    return next(e);
   }
 }

@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const UserModel = require("../models/User");
 const ApiError = require("../errors/ApiError");
 const { errorCodes } = require("../errors");
+const { userTypes } = require("../models/constants");
 
 const createToken = async (payload) => {
   try {
@@ -29,6 +30,13 @@ const checkToken = async (req, res, next) => {
     const searchUser = await UserModel.findOne({
       _id: user._id,
     });
+
+    // ignore if he is guest
+    if (user?.userType == userTypes.GUEST) {
+      req.user = user;
+      return next();
+    }
+
     if (searchUser) {
       req.user = searchUser;
       return next();

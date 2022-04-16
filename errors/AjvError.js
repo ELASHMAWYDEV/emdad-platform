@@ -5,6 +5,8 @@ const ApiError = require("./ApiError");
 
 class AjvError extends ApiError {
   constructor(errors) {
+    console.log(errors)
+
     const details = errors.map(({
       params,
       message

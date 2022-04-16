@@ -2,11 +2,14 @@ const UserService = require("../../services/user");
 const SettingsService = require("../../services/settings");
 const SupplyService = require("../../services/supply");
 const ProductService = require("../../services/product");
+const TransportationService = require("../../services/transportation");
+const { userTypes } = require("../../../../models/constants");
 
 const getHomeData = async (req, res, next) => {
   try {
     const vendors = await UserService.listVendors({});
-    const favouriteVendors = await UserService.getFavouriteVendors(req.user._id);
+    const favouriteVendors =
+      req.user.userType == userTypes.GUEST ? [] : await UserService.getFavouriteVendors(req.user._id);
     const featuredVendors = await SettingsService.listFeaturedVendors();
 
     return res.json({
@@ -86,7 +89,7 @@ const getProductInfo = async (req, res, next) => {
   }
 };
 
-const addVendorToFavourites = async (req, res, next) => {
+const toggleVendorToFavourites = async (req, res, next) => {
   try {
     const { vendorId } = req.params;
     const result = await UserService.toggleVendorToFavourites({ vendorId, userId: req.user._id });
@@ -193,17 +196,53 @@ const getSupplyRequestInfo = async (req, res, next) => {
   }
 };
 
+const createTransportationRequest = async (req, res, next) => {
+  try {
+    const transportationRequest = req.body;
+    const result = await TransportationService.createTransportationRequest({
+      ...transportationRequest,
+      requesterId: req.user._id,
+      requesterType: req.user.userType,
+    });
+
+    return res.json({
+      status: true,
+      message: "تم ارسال الطلب بنجاح",
+      data: { transportationRequest: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const acceptTransportationOffer = async (req, res, next) => {
+  try {
+    const { transportationOfferId } = req.params;
+    const result = await TransportationService.acceptTransportationOffer(transportationOfferId);
+
+    return res.json({
+      status: true,
+      message: "تمت الموافقة علي عرض التوصيل بنجاح",
+      data: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   getHomeData,
   getListOfVendors,
   getVendorInfo,
   getVendorProducts,
   getProductInfo,
-  addVendorToFavourites,
+  toggleVendorToFavourites,
   rateVendor,
   createSupplyRequest,
   resendSupplyRequest,
   listSupplyRequests,
   getSupplyRequestInfo,
-  acceptSupplyRequest
+  acceptSupplyRequest,
+  createTransportationRequest,
+  acceptTransportationOffer,
 };
