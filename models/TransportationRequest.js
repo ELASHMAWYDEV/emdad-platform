@@ -1,5 +1,6 @@
 const { Schema, model, Types } = require("mongoose");
 const { transportationStatus, userTypes } = require("./constants");
+const { denormalizedTransportationOfferSchema } = require("./TransportationOffer");
 
 const TransportationRequestSchema = new Schema(
   {
@@ -17,20 +18,27 @@ const TransportationRequestSchema = new Schema(
       type: Types.ObjectId,
       ref: "SupplyRequest",
       required: true,
+      unique: true,
+    },
+    transportationMethod: {
+      type: String,
+      required: true,
     },
     transportationStatus: {
       type: String,
       enum: Object.values(transportationStatus),
       required: true,
-      default: transportationStatus.PENDING,
+      default: transportationStatus.AWAITING_OFFERS,
     },
-    transportationOfferId: {
-      type: Types.ObjectId,
-      ref: "TransportationOffer",
+    transportationOffer: { type: denormalizedTransportationOfferSchema },
+    city: {
+      type: String,
       required: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-module.exports = model("TransportationRequest", TransportationRequestSchema, "transportationOffers");
+module.exports = model("TransportationRequest", TransportationRequestSchema, "transportationRequests");

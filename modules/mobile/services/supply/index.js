@@ -7,16 +7,100 @@ const schemas = require("./schemas");
 const CustomError = require("../../../../errors/CustomError");
 const { WEBSITE_URL } = require("../../../../globals");
 
+const listSupplyRequests = async ({ userId = null, vendorId = null, paginationToken = null, _id }) => {
+  const supplyRequests = await SupplyRequestModel.aggregate([
+    {
+      $match: {
+        ...(_id && { _id: new Types.ObjectId(_id) }),
+        ...(paginationToken && {
+          _id: {
+            $gt: paginationToken,
+          },
+        }),
+        ...(userId && { userId }),
+        ...(vendorId && { vendorId }),
+      },
+    },
+    { $limit: 15 },
+    {
+      $lookup: {
+        from: "users",
+        let: { userId: "$userId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              vendorType: 1,
+              country: 1,
+              city: 1,
+              location: 1,  
+              oraganizationName: 1,
+              logo: { $concat: [WEBSITE_URL, "/images/users/", "$logo"] },
+            },
+          },
+        ],
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    },
+    {
+      $lookup: {
+        from: "users",
+        let: { vendroId: "$vendorId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$vendroId"] } } },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              country: 1,
+              city: 1,
+              location: 1,
+              oraganizationName: 1,
+              logo: { $concat: [WEBSITE_URL, "/images/users/", "$logo"] },
+            },
+          },
+        ],
+        as: "vendor",
+      },
+    },
+    {
+      $unwind: "$vendor",
+    },
+  ]);
+
+  return supplyRequests;
+};
+
+const getSupplyRequestInfo = async (supplyRequestId) => {
+  const supplyRequest = (await listSupplyRequests({ _id: supplyRequestId }))[0];
+
+  if (!supplyRequest)
+    throw new CustomError("SUPPLY_REQEUST_NOT_FOUND", "طلب عرض السعر الذي تريد الوصول اليه غير موجود");
+
+  return supplyRequest;
+};
+
 // User only
 const createSupplyRequest = validateSchema(schemas.createSupplyRequestSchema)(async (supplyRequest) => {
   // Check if vendorId exist
   const isVendorValid = await UserModel.findOne({ _id: supplyRequest.vendorId, userType: userTypes.VENDOR });
   if (!isVendorValid) throw new CustomError("VENDOR_NOT_EXIST", "البائع الذي تحاول الشراء منه غير موجود");
 
+  // Generate the custom id
+  const totalSupplyRequests = await SupplyRequestModel.countDocuments();
+
+  const generatedId = `MD_${totalSupplyRequests + 10000}`;
+
   // Create the supply request first
   const result = await SupplyRequestModel.create({
     ...supplyRequest,
     transportationHandler: supplyRequest.isTransportationNeeded ? userTypes.VENDOR : userTypes.USER,
+    generatedId,
   });
 
   const createdSupplyRequest = await getSupplyRequestInfo(result._id);
@@ -27,6 +111,13 @@ const createSupplyRequest = validateSchema(schemas.createSupplyRequestSchema)(as
 
 // User only
 const resendSupplyRequest = validateSchema(schemas.resendSupplyRequestSchema)(async (supplyRequest) => {
+  // Validate request status & existence
+  const supplyRequestSearch = await getSupplyRequestInfo(supplyRequest.supplyRequestId);
+
+  // Check if request status is fucked
+  if (supplyRequestSearch.requestStatus != supplyRequestStatus.AWAITING_APPROVAL)
+    throw new CustomError("STATUS_NOT_CORRECT", "لا يمكنك اعادة ارسال العرض، حالة العرض غير صحيحة");
+
   await SupplyRequestModel.updateOne(
     { _id: supplyRequest.supplyRequestId },
     {
@@ -49,10 +140,7 @@ const resendSupplyRequest = validateSchema(schemas.resendSupplyRequestSchema)(as
 const quoteSupplyRequest = validateSchema(schemas.quoteSupplyRequestSchema)(
   async ({ requestItems = [], additionalItems = [], ...quotation }) => {
     // Validate request status & existence
-    const supplyRequestSearch = await SupplyRequestModel.findOne({
-      _id: quotation.supplyRequestId,
-    });
-    if (!supplyRequestSearch) throw new CustomError("NO_SUPPLY_REQUEST_FOUND", "لا يوجد عرض سعر بالمعرف الذي ارسلته");
+    const supplyRequestSearch = await getSupplyRequestInfo(quotation.supplyRequestId);
 
     // Check if request status is fucked
     if (supplyRequestSearch.requestStatus != supplyRequestStatus.AWAITING_QUOTATION)
@@ -110,6 +198,7 @@ const quoteSupplyRequest = validateSchema(schemas.quoteSupplyRequestSchema)(
           update: {
             $set: {
               requestStatus: supplyRequestStatus.AWAITING_APPROVAL,
+              estimationInSeconds: quotation.estimationInSeconds,
               ...(quotation.transportationPrice &&
                 supplyRequestSearch.transportationHandler == userTypes.VENDOR && {
                   transportationPrice: quotation.transportationPrice,
@@ -131,11 +220,9 @@ const quoteSupplyRequest = validateSchema(schemas.quoteSupplyRequestSchema)(
   }
 );
 
+// User Only
 const acceptSupplyRequest = async (supplyRequestId) => {
-  const supplyRequestSearch = await SupplyRequestModel.findOne({
-    _id: supplyRequestId,
-  });
-  if (!supplyRequestSearch) throw new CustomError("NO_SUPPLY_REQUEST_FOUND", "لا يوجد عرض سعر بالمعرف الذي ارسلته");
+  const supplyRequestSearch = await getSupplyRequestInfo(supplyRequestId);
 
   // Check if request status is fucked
   if (supplyRequestSearch.requestStatus != supplyRequestStatus.AWAITING_APPROVAL)
@@ -151,84 +238,6 @@ const acceptSupplyRequest = async (supplyRequestId) => {
 
   // @TODO: send notification to the vendor
   return updatedSupplyRequest;
-};
-
-const listSupplyRequests = async ({ userId = null, vendorId = null, paginationToken = null, _id }) => {
-  const supplyRequests = await SupplyRequestModel.aggregate([
-    {
-      $match: {
-        ...(_id && { _id: new Types.ObjectId(_id) }),
-        ...(paginationToken && {
-          _id: {
-            $gt: paginationToken,
-          },
-        }),
-        ...(userId && { userId }),
-        ...(vendorId && { vendorId }),
-      },
-    },
-    { $limit: 15 },
-    {
-      $lookup: {
-        from: "users",
-        let: { userId: "$userId" },
-        pipeline: [
-          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-          {
-            $project: {
-              _id: 1,
-              name: 1,
-              vendorType: 1,
-              country: 1,
-              city: 1,
-              location: 1,
-              oraganizationName: 1,
-              logo: { $concat: [WEBSITE_URL, "/images/users/", "$logo"] },
-            },
-          },
-        ],
-        as: "user",
-      },
-    },
-    {
-      $unwind: "$user",
-    },
-    {
-      $lookup: {
-        from: "users",
-        let: { userId: "$userId" },
-        pipeline: [
-          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-          {
-            $project: {
-              _id: 1,
-              name: 1,
-              country: 1,
-              city: 1,
-              location: 1,
-              oraganizationName: 1,
-              logo: { $concat: [WEBSITE_URL, "/images/users/", "$logo"] },
-            },
-          },
-        ],
-        as: "vendor",
-      },
-    },
-    {
-      $unwind: "$vendor",
-    },
-  ]);
-
-  return supplyRequests;
-};
-
-const getSupplyRequestInfo = async (supplyRequestId) => {
-  const supplyRequest = (await listSupplyRequests({ _id: supplyRequestId }))[0];
-  console.log(supplyRequest);
-  if (!supplyRequest)
-    throw new CustomError("SUPPLY_REQEUST_NOT_FOUND", "طلب عرض السعر الذي تريد الوصول اليه غير موجود");
-
-  return supplyRequest;
 };
 
 module.exports = {

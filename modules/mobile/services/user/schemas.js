@@ -1,4 +1,31 @@
 module.exports = {
+  listTransportersSchema: {
+    type: "object",
+    additionalProperties: true,
+    properties: {
+      paginationToken: {
+        type: ["string", "object"],
+      },
+      limit: {
+        type: "number"
+      },
+      searchQuery: {
+        type: "string",
+      },
+      transportationMethods: {
+        type: "array",
+        items: [{
+          type: "string",
+        }, ],
+      },
+      city: {
+        type: "string",
+      },
+      country: {
+        type: "string",
+      },
+    },
+  },
   listVendorsSchema: {
     type: "object",
     additionalProperties: false,
@@ -6,16 +33,17 @@ module.exports = {
       paginationToken: {
         type: ["string", "object"],
       },
+      limit: {
+        type: "number"
+      },
       searchQuery: {
         type: "string",
       },
       vendorType: {
         type: "array",
-        items: [
-          {
-            type: "string",
-          },
-        ],
+        items: [{
+          type: "string",
+        }, ],
       },
       city: {
         type: "string",

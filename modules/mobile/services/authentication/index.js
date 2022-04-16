@@ -14,7 +14,7 @@ const twilioClient = require("twilio")(TWILIO_SID, TWILIO_TOKEN);
 const { errorCodes } = require("../../../../errors");
 const UserModel = require("../../../../models/User");
 const OtpModel = require("../../../../models/Otp");
-const { countryCodes } = require("../../../../models/constants");
+const { countryCodes, userTypes } = require("../../../../models/constants");
 const { createToken } = require("../../../../middlewares/jwt");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas");
@@ -305,9 +305,19 @@ const registerNewUser = validateSchema(schemas.registrationSchema)(async (user) 
   };
 });
 
+const registerGuest = async () => {
+  //Send the jwt token with the success response
+  const accessToken = await createToken({
+    userType: userTypes.GUEST,
+  });
+
+  return { accessToken };
+};
+
 module.exports = {
   loginUser,
   registerNewUser,
   verifyOneTimePass,
   sendOtp,
+  registerGuest,
 };

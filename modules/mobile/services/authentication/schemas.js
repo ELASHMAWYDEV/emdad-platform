@@ -9,9 +9,6 @@ module.exports = {
       user: {
         type: "string",
       },
-      phone: {
-        type: "string",
-      },
       password: {
         type: "string",
       },

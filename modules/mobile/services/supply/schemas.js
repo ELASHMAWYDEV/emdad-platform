@@ -101,9 +101,12 @@ module.exports = {
   },
   quoteSupplyRequestSchema: {
     type: "object",
-    required: ["vendorId", "supplyRequestId", "requestItems"],
+    required: ["vendorId", "supplyRequestId", "requestItems", "estimationInSeconds"],
     additionalProperties: false,
     properties: {
+      estimationInSeconds: {
+        type: "number",
+      },
       vendorId: {
         type: ["object", "string"],
       },

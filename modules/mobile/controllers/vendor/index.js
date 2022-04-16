@@ -1,5 +1,6 @@
 const ProductService = require("../../services/product");
 const SupplyService = require("../../services/supply");
+const TransportationService = require("../../services/transportation");
 
 const addProduct = async (req, res, next) => {
   try {
@@ -95,11 +96,68 @@ const getProductDetails = async (req, res, next) => {
   }
 };
 
+const createTransportationRequest = async (req, res, next) => {
+  try {
+    const transportationRequest = req.body;
+    const result = await TransportationService.createTransportationRequest({
+      ...transportationRequest,
+      requesterId: req.user._id,
+      requesterType: req.user.userType,
+    });
+
+    return res.json({
+      status: true,
+      message: "تم ارسال الطلب بنجاح",
+      data: { transportationRequest: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const listTransportationOffers = async (req, res, next) => {
+  try {
+    const { paginationToken, limit } = req.query;
+    const { transportationRequestId } = req.params;
+    const result = await TransportationService.listTransportationOffers({
+      transportationRequestId,
+      paginationToken,
+      limit,
+    });
+
+    return res.json({
+      status: true,
+      message: "تم استرجاع البيانات بنجاح",
+      data: { transportationOffers: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const acceptTransportationOffer = async (req, res, next) => {
+  try {
+    const { transportationOfferId } = req.params;
+    const result = await TransportationService.acceptTransportationOffer(transportationOfferId);
+
+    return res.json({
+      status: true,
+      message: "تمت الموافقة علي عرض التوصيل بنجاح",
+      data: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   addProduct,
   quoteSupplyRequest,
   listSupplyRequests,
   getSupplyRequestInfo,
   listProducts,
-  getProductDetails
+  getProductDetails,
+  createTransportationRequest,
+  listTransportationOffers,
+  acceptTransportationOffer,
 };
