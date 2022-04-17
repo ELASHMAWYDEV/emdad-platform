@@ -1,4 +1,5 @@
 const { Schema, model, Types } = require("mongoose");
+const mongooseLeanVirtuals = require("mongoose-lean-virtuals");
 
 const denormalizedTransportationOfferSchema = new Schema(
   {
@@ -48,8 +49,14 @@ const TransportationOfferSchema = new Schema(
       type: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+TransportationOfferSchema.virtual("id").get(() => {
+  return this._id;
+});
+
+TransportationOfferSchema.plugin(mongooseLeanVirtuals);
 
 module.exports = model("TransportationOffer", TransportationOfferSchema, "transportationOffers");
 module.exports.denormalizedTransportationOfferSchema = denormalizedTransportationOfferSchema;

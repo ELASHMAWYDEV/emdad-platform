@@ -3,6 +3,7 @@ const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas.js");
 const { WEBSITE_URL } = require("../../../../globals");
 const CustomError = require("../../../../errors/CustomError");
+const { ObjectId } = require("../../../../models/constants");
 
 const addProduct = validateSchema(schemas.addProductSchema)(async (product) => {
   // Validation on images
@@ -16,16 +17,29 @@ const addProduct = validateSchema(schemas.addProductSchema)(async (product) => {
   return createdProduct;
 });
 
-const listProducts = async ({ vendorId, categorized = false, productType = [], paginationToken = null }) => {
-  const products = await ProductModel.find({
-    ...(paginationToken && {
-      _id: {
-        $gt: paginationToken,
+const listProducts = async ({
+  vendorId,
+  categorized = false,
+  productType = [],
+  paginationToken = null,
+  limit = 10,
+}) => {
+  const products = await ProductModel.aggregate([
+    {
+      $match: {
+        ...(paginationToken && {
+          _id: {
+            $gt: paginationToken,
+          },
+        }),
+        ...(productType.length !== 0 && { productType: { $in: productType } }),
+        vendorId: ObjectId(vendorId),
       },
-    }),
-    ...(productType.length !== 0 && { productType: { $in: productType } }),
-    vendorId,
-  }).lean();
+    },
+    {
+      $limit: limit,
+    },
+  ]);
 
   let productCategories;
   if (categorized && productType.length === 0) {
@@ -44,7 +58,7 @@ const listProducts = async ({ vendorId, categorized = false, productType = [], p
       })),
     };
   } else {
-    return { products: products.slice(0, 10) };
+    return { products };
   }
 };
 

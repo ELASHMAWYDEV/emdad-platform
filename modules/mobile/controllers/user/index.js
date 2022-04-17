@@ -62,7 +62,7 @@ const getVendorProducts = async (req, res, next) => {
   try {
     const { vendorId } = req.params;
     const filters = req.query;
-    const result = await ProductService.listProducts({ vendorId, ...filters, categorized: true });
+    const result = await ProductService.listProducts({ vendorId, ...filters });
 
     return res.json({
       status: true,

@@ -1,3 +1,5 @@
+const { Types } = require("mongoose");
+
 const userTypes = {
   GUEST: "guest",
   USER: "user",
@@ -42,6 +44,13 @@ const paymentStatus = {
   AWAITING_PAYMENT: "awaitingPayment",
   PAID: "paid",
 };
+
+// Mongoose utils
+const ObjectId = (id) => {
+  if (typeof id === "string") return new Types.ObjectId(id);
+  else return id;
+};
+
 module.exports = {
   userTypes,
   supportedLanguages,
@@ -50,4 +59,5 @@ module.exports = {
   supplyRequestStatus,
   transportationStatus,
   paymentStatus,
+  ObjectId,
 };

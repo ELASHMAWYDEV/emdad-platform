@@ -1,4 +1,5 @@
 const { Schema, model, Types } = require("mongoose");
+const mongooseLeanVirtuals = require("mongoose-lean-virtuals");
 
 const HelpRequestSchema = new Schema(
   {
@@ -26,7 +27,17 @@ const HelpRequestSchema = new Schema(
       type: Date,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+HelpRequestSchema.virtual("id").get(() => {
+  return this._id;
+});
+
+HelpRequestSchema.plugin(mongooseLeanVirtuals);
 
 module.exports = model("HelpRequest", HelpRequestSchema, "transportationMethods");

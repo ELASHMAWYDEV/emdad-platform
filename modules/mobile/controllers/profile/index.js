@@ -57,16 +57,18 @@ const editPassword = async (req, res, next) => {
 
 const editEmail = async (req, res, next) => {
   try {
-    const { email } = req.body;
-    await ProfileService.editUserEmail({
-      email,
+    const { oldEmail, newEmail, password } = req.body;
+    const userAfterUpdate = await ProfileService.editUserEmail({
+      oldEmail,
+      newEmail,
+      password,
       _id: req.user._id,
     });
 
     return res.json({
       status: true,
       message: "تم تعديل  بريدك الالكتروني بنجاح",
-      data: null,
+      data: { user: userAfterUpdate },
     });
   } catch (e) {
     next(e);
