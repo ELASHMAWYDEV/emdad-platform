@@ -3,7 +3,7 @@ const FavouriteModel = require("../../../../models/Favourite");
 const RatingModel = require("../../../../models/Rating");
 const ProductModel = require("../../../../models/Product");
 const ProductService = require("../product");
-const { userTypes } = require("../../../../models/constants");
+const { userTypes, ObjectId } = require("../../../../models/constants");
 const ApiError = require("../../../../errors/ApiError");
 const { errorCodes } = require("../../../../errors");
 const { validateSchema } = require("../../../../middlewares/schema");
@@ -49,7 +49,7 @@ const listTransporters = validateSchema(schemas.listTransportersSchema)(
       }),
     })
       .limit(limit)
-      .select("-password")
+      .select("-password -firebaseToken")
       .lean();
 
     return vendors;
@@ -94,20 +94,35 @@ const listVendors = validateSchema(schemas.listVendorsSchema)(
   }
 );
 
-const getVendorRatings = async ({ vendorId, paginationToken = null }) => {
-  const ratings = await RatingModel.find({
-    ...(paginationToken && {
-      _id: {
-        $gt: paginationToken,
+const getVendorRatings = async ({ vendorId, paginationToken = null, limit = 10 }) => {
+  const ratings = await RatingModel.aggregate([
+    {
+      $match: {
+        ...(paginationToken && {
+          _id: {
+            $gt: paginationToken,
+          },
+        }),
+        targetId: ObjectId(vendorId),
       },
-    }),
-    targetId: vendorId,
-  })
-    .limit(10)
-    .populate({
-      path: "userId",
-      select: "name country city",
-    });
+    },
+    { $limit: limit },
+    {
+      $lookup: {
+        from: "users",
+        let: { userId: "$userId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+          { $project: { _id: 1, name: 1, country: 1, city: 1 } },
+        ],
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    },
+  ]);
+
   // Calculate the average
   const overAllRating = ratings?.reduce((curr, acc) => (curr + acc.rating) / 2, ratings[0]?.rating);
 
@@ -172,7 +187,6 @@ const toggleVendorToFavourites = async ({ vendorId, userId }) => {
     },
   });
 
-  console.log(isExist);
   if (isExist)
     await FavouriteModel.updateOne(
       {
