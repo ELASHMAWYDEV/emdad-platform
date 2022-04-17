@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
 const { userTypes, countryCodes } = require("./constants");
+const mongooseLeanVirtuals = require("mongoose-lean-virtuals");
 
 const pointSchema = new Schema({
   type: {
@@ -100,7 +101,7 @@ const UserSchema = new Schema(
       required: isTransporterTypeRequired,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 function isVendorTypeRequired() {
@@ -114,5 +115,11 @@ function isTransporterTypeRequired() {
 function isUserTypeSpecified() {
   return !!this.userType;
 }
+
+UserSchema.virtual("id").get(() => {
+  return this._id;
+});
+
+UserSchema.plugin(mongooseLeanVirtuals);
 
 module.exports = model("User", UserSchema, "users");

@@ -1,4 +1,5 @@
 const { Schema, model, Types } = require("mongoose");
+const mongooseLeanVirtuals = require("mongoose-lean-virtuals");
 
 const RatingSchema = new Schema(
   {
@@ -25,7 +26,17 @@ const RatingSchema = new Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+RatingSchema.virtual("id").get(() => {
+  return this._id;
+});
+
+RatingSchema.plugin(mongooseLeanVirtuals);
 
 module.exports = model("Rating", RatingSchema, "ratings");

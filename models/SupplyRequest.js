@@ -1,4 +1,5 @@
 const { Schema, model, Types } = require("mongoose");
+const mongooseLeanVirtuals = require("mongoose-lean-virtuals");
 const { supplyRequestStatus, userTypes, paymentStatus } = require("./constants");
 const { denormalizedProductSchema } = require("./Product");
 
@@ -63,7 +64,17 @@ const SupplyRequestSchema = new Schema(
       type: Number,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+SupplyRequestSchema.virtual("id").get(() => {
+  return this._id;
+});
+
+SupplyRequestSchema.plugin(mongooseLeanVirtuals);
 
 module.exports = model("SupplyRequest", SupplyRequestSchema, "supplyRequests");

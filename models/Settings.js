@@ -1,4 +1,5 @@
 const { Schema, model, Types } = require("mongoose");
+const mongooseLeanVirtuals = require("mongoose-lean-virtuals");
 const { countryCodes, settingsKeys } = require("./constants");
 
 const SettingsSchema = new Schema(
@@ -29,7 +30,17 @@ const SettingsSchema = new Schema(
       ref: "User",
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+SettingsSchema.virtual("id").get(() => {
+  return this._id;
+});
+
+SettingsSchema.plugin(mongooseLeanVirtuals);
 
 module.exports = model("Settings", SettingsSchema, "settings");
