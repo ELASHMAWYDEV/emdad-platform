@@ -259,9 +259,6 @@ const loginUser = validateSchema(schemas.loginSchema)(async ({ user, password, f
     };
   }
 
-  // Set the logo url
-  if (userObject.logo) userObject.logo = `${WEBSITE_URL}/images/users/${userObject.logo}`;
-
   return {
     accessToken,
     user: userObject,
@@ -297,8 +294,6 @@ const registerNewUser = validateSchema(schemas.registrationSchema)(async (user) 
   //Send OTP to the user
   sendOtp(userObject._id);
 
-  // Set the logo url
-  if (userObject.logo) userObject.logo = `${WEBSITE_URL}/images/users/${userObject.logo}`;
   return {
     user: userObject,
     accessToken,

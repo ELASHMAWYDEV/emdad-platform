@@ -1,7 +1,6 @@
 const { Schema, model, Types } = require("mongoose");
 const mongooseLeanVirtuals = require("mongoose-lean-virtuals");
-
-
+const { WEBSITE_URL } = require("../globals");
 
 const denormalizedProductSchema = new Schema({
   name: {
@@ -80,9 +79,12 @@ const ProductSchema = new Schema(
   }
 );
 
-
-ProductSchema.virtual("id").get(() => {
+ProductSchema.virtual("id").get(function () {
   return this._id;
+});
+
+ProductSchema.virtual("imagesUrls").get(function () {
+  return this.images.map((img) => `${WEBSITE_URL}/images/products/${img}`);
 });
 
 ProductSchema.plugin(mongooseLeanVirtuals);

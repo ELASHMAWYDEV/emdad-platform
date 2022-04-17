@@ -149,7 +149,7 @@ const getVendorInfo = async (vendorId) => {
   // Get the vendor data
   const vendorInfo = await UserModel.findOne({
     _id: vendorId,
-  }).lean();
+  }).lean({ virtuals: true });
   delete vendorInfo.firebaseToken;
   delete vendorInfo.password;
 
@@ -161,7 +161,9 @@ const getVendorInfo = async (vendorId) => {
   // Get vendor products
   const products = await ProductService.listProducts({
     vendorId,
+    categorized: true,
   });
+
   return {
     vendorInfo,
     ratings,

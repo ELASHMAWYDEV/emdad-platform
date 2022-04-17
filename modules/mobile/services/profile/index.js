@@ -4,7 +4,6 @@ const { errorCodes } = require("../../../../errors");
 const UserModel = require("../../../../models/User");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas.js");
-const { WEBSITE_URL } = require("../../../../globals");
 const CustomError = require("../../../../errors/CustomError");
 
 const completeUserProfile = validateSchema(schemas.completeProfileSchema)(async ({ _id, location, ...user }) => {
@@ -23,7 +22,7 @@ const completeUserProfile = validateSchema(schemas.completeProfileSchema)(async 
   )
     throw new ApiError(errorCodes.PROFILE_ALREADY_COMPLETED);
 
-  await UserModel.updateOne(
+  const userAfterUpdate = await UserModel.updateOne(
     {
       _id,
     },
@@ -32,16 +31,11 @@ const completeUserProfile = validateSchema(schemas.completeProfileSchema)(async 
       location: {
         coordinates: [location.lng, location.lat],
       },
-    }
-  );
+    },
+    { new: true }
+  ).lean({ virtuals: true });
 
-  // Get the user after update
-  let userSearch = await UserModel.findById(_id);
-
-  // Set the logo url
-  if (userSearch.logo) userSearch.logo = `${WEBSITE_URL}/images/users/${userSearch.logo}`;
-
-  return userSearch;
+  return userAfterUpdate;
 });
 
 const editUserProfile = validateSchema(schemas.editProfileSchema)(async ({ _id, location, ...user }) => {
@@ -49,7 +43,7 @@ const editUserProfile = validateSchema(schemas.editProfileSchema)(async ({ _id, 
   if (user.logo && !/\w+-\w+-\w+-\w+-\w+\.\w+/.test(user.logo))
     throw new CustomError("IMAGES_NOT_UPLOADED", "الصورة التي ارسلتها  لم تقم برفعها من قبل");
 
-  await UserModel.updateOne(
+  const userAfterUpdate = await UserModel.findOneAndUpdate(
     {
       _id,
     },
@@ -60,16 +54,11 @@ const editUserProfile = validateSchema(schemas.editProfileSchema)(async ({ _id, 
           coordinates: [location.lng, location.lat],
         },
       }),
-    }
-  );
+    },
+    { new: true }
+  ).lean({ virtuals: true });
 
-  // Get the user after update
-  let userSearch = await UserModel.findById(_id);
-
-  // Set the logo url
-  if (userSearch.logo) userSearch.logo = `${WEBSITE_URL}/images/users/${userSearch.logo}`;
-
-  return userSearch;
+  return userAfterUpdate;
 });
 
 const editUserPassword = validateSchema(schemas.editPasswordSchema)(
@@ -117,7 +106,7 @@ const editUserEmail = validateSchema(schemas.editEmailSchema)(async ({ _id, oldE
       primaryEmail: newEmail,
     },
     { new: true }
-  );
+  ).lean({ virtuals: true });
 
   return userAfterUpdate;
 });
