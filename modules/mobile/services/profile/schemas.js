@@ -130,14 +130,21 @@ module.exports = {
   },
   editEmailSchema: {
     type: "object",
-    required: ["_id", "email"],
+    required: ["_id", "oldEmail", "newEmail", "password"],
     properties: {
       _id: {
         type: "object",
       },
-      email: {
+      oldEmail: {
         type: "string",
         format: "email",
+      },
+      newEmail: {
+        type: "string",
+        format: "email",
+      },
+      password: {
+        type: "string",
       },
     },
   },

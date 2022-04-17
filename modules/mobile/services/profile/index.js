@@ -99,15 +99,27 @@ const editUserPassword = validateSchema(schemas.editPasswordSchema)(
   }
 );
 
-const editUserEmail = validateSchema(schemas.editEmailSchema)(async ({ _id, email }) => {
-  await UserModel.updateOne(
+const editUserEmail = validateSchema(schemas.editEmailSchema)(async ({ _id, oldEmail, newEmail, password }) => {
+  let userObject = await UserModel.findById(_id);
+
+  // Password Match
+  if (!(await bcrypt.compare(password, userObject.password))) throw new ApiError(errorCodes.PASSWORD_NOT_CORRECT);
+
+  // Email validation
+  if (oldEmail !== userObject.primaryEmail) throw new ApiError(errorCodes.EMAIL_NOT_CORRECT);
+  if (newEmail === userObject.primaryEmail) throw new ApiError(errorCodes.EMAIL_DID_NOT_CHANGE);
+
+  const userAfterUpdate = await UserModel.findOneAndUpdate(
     {
       _id,
     },
     {
-      primaryEmail: email,
-    }
+      primaryEmail: newEmail,
+    },
+    { new: true }
   );
+
+  return userAfterUpdate;
 });
 
 module.exports = {

@@ -15,6 +15,9 @@ const errorCodes = Object.freeze({
   PROFILE_ALREADY_COMPLETED: "PROFILE_ALREADY_COMPLETED",
   OLD_PASSWORD_INCORRECT: "OLD_PASSWORD_INCORRECT",
   PASSWORD_NOT_MATCH: "PASSWORD_NOT_MATCH",
+  PASSWORD_NOT_CORRECT: "PASSWORD_NOT_CORRECT",
+  EMAIL_NOT_CORRECT: "EMAIL_NOT_CORRECT",
+  EMAIL_DID_NOT_CHANGE: "EMAIL_DID_NOT_CHANGE",
   NO_SUPPLIERS_FOUND: "NO_SUPPLIERS_FOUND",
   NO_SETTINGS_FOUND: "NO_SETTINGS_FOUND",
   PRODUCT_NOT_FOUND: "PRODUCT_NOT_FOUND",
@@ -70,6 +73,18 @@ const errors = Object.freeze({
   [errorCodes.PASSWORD_NOT_MATCH]: {
     status: statuses.OK,
     message: "كلمة المرور الجديدة وتأكيدها غير متطابقين",
+  },
+  [errorCodes.PASSWORD_NOT_CORRECT]: {
+    status: statuses.OK,
+    message: "كلمة المرور غير صحيحة",
+  },
+  [errorCodes.EMAIL_NOT_CORRECT]: {
+    status: statuses.OK,
+    message: "البريد الالكتروني الذي ادخلته غير صحيح",
+  },
+  [errorCodes.EMAIL_DID_NOT_CHANGE]: {
+    status: statuses.OK,
+    message: "لم تقم بعمل أي تغيير علي البريد الالكتروني القديم",
   },
   [errorCodes.NO_SUPPLIERS_FOUND]: {
     status: statuses.OK,
