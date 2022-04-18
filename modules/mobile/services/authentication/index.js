@@ -216,7 +216,7 @@ const loginUser = validateSchema(schemas.loginSchema)(async ({ user, password, f
   }
 
   //Update firebase token
-  await UserModel.updateOne(
+  userObject = await UserModel.findOneAndUpdate(
     {
       _id: userObject._id,
     },
@@ -224,8 +224,11 @@ const loginUser = validateSchema(schemas.loginSchema)(async ({ user, password, f
       $set: {
         firebaseToken,
       },
-    }
-  );
+    },
+    { new: true }
+  )
+    .select("-firebaseToken -password")
+    .lean({ virtuals: true });
 
   //Send the jwt token with the success response
   const accessToken = await createToken({

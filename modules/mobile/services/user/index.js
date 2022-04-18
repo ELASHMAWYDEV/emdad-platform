@@ -70,7 +70,7 @@ const listVendors = validateSchema(schemas.listVendorsSchema)(
           $regex: ".*" + searchQuery + ".*",
         },
       }),
-      ...(vendorType && {
+      ...(vendorType.length !== 0 && {
         vendorType: {
           $in: vendorType,
         },
@@ -88,7 +88,7 @@ const listVendors = validateSchema(schemas.listVendorsSchema)(
     })
       .limit(limit)
       .select("-firebaseToken -password -userType")
-      .lean();
+      .lean({ virtuals: true });
 
     return vendors;
   }

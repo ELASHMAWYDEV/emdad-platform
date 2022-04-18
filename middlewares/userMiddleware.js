@@ -2,7 +2,6 @@ const { userTypes } = require("../models/constants");
 
 module.exports = (req, res, next) => {
   try {
-    console.log({ user: req.user });
     if (req.isGuestUser) return next();
 
     if (req.user && req?.user?.userType != userTypes.USER)

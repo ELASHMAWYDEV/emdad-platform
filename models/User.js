@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 const { userTypes, countryCodes } = require("./constants");
 const mongooseLeanVirtuals = require("mongoose-lean-virtuals");
+
 const { WEBSITE_URL } = require("../globals");
 
 const pointSchema = new Schema({
@@ -124,6 +125,10 @@ UserSchema.virtual("id").get(function () {
 
 UserSchema.virtual("logoUrl").get(function () {
   return `${WEBSITE_URL}/images/users/${this.logo}`;
+});
+
+UserSchema.virtual("locationObject").get(function () {
+  return { lat: this.location.coordinates[1], lng: this.location.coordinates[0] };
 });
 
 UserSchema.plugin(mongooseLeanVirtuals);
