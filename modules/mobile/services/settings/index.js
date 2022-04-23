@@ -23,6 +23,7 @@ const getMobileSettings = async () => {
   return settings;
 };
 
+
 const listFeaturedVendors = async () => {
   const settings = await SettingsModel.findOne({
     key: settingsKeys.FEATURED_VENDORS,
