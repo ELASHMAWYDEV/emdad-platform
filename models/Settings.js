@@ -37,7 +37,7 @@ const SettingsSchema = new Schema(
   }
 );
 
-SettingsSchema.virtual("id").get(() => {
+SettingsSchema.virtual("id").get(function () {
   return this._id;
 });
 

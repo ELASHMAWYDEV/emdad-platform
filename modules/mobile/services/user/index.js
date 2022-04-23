@@ -57,7 +57,15 @@ const listTransporters = validateSchema(schemas.listTransportersSchema)(
 );
 
 const listVendors = validateSchema(schemas.listVendorsSchema)(
-  async ({ paginationToken = null, limit = 10, searchQuery = "", vendorType = [], city = "", country = "" }) => {
+  async ({
+    paginationToken = null,
+    limit = 10,
+    searchQuery = "",
+    vendorType = [],
+    city = "",
+    country = "",
+    includeRatings,
+  }) => {
     const vendors = await UserModel.find({
       userType: userTypes.VENDOR,
       ...(paginationToken && {
@@ -95,7 +103,7 @@ const listVendors = validateSchema(schemas.listVendorsSchema)(
 );
 
 const getVendorRatings = async ({ vendorId, paginationToken = null, limit = 10 }) => {
-  const ratings = await RatingModel.aggregate([
+  let ratings = await RatingModel.aggregate([
     {
       $match: {
         ...(paginationToken && {
@@ -113,7 +121,7 @@ const getVendorRatings = async ({ vendorId, paginationToken = null, limit = 10 }
         let: { userId: "$userId" },
         pipeline: [
           { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-          { $project: { _id: 1, name: 1, country: 1, city: 1 } },
+          { $project: { _id: 1, name: 1, country: 1, city: 1, logo: 1 } },
         ],
         as: "user",
       },
@@ -122,6 +130,11 @@ const getVendorRatings = async ({ vendorId, paginationToken = null, limit = 10 }
       $unwind: "$user",
     },
   ]);
+
+  ratings = ratings.map((rating) => ({
+    ...new RatingModel(rating).toJSON(),
+    user: new UserModel(rating.user).toJSON(),
+  }));
 
   // Calculate the average
   const overAllRating = ratings?.reduce((curr, acc) => (curr + acc.rating) / 2, ratings[0]?.rating);
@@ -168,7 +181,7 @@ const getVendorInfo = async (vendorId) => {
     vendorInfo,
     ratings,
     overAllRating,
-    products,
+    categories: products.categories,
   };
 };
 

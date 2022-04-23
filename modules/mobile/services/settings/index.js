@@ -1,15 +1,24 @@
 const SettingsModel = require("../../../../models/Settings");
-const { settingsKeys } = require("../../../../models/constants");
+const { settingsKeys, countries } = require("../../../../models/constants");
 const { errorCodes } = require("../../../../errors");
 const ApiError = require("../../../../errors/ApiError");
-const { countryCodes } = require("../../../../models/constants");
 
 const getMobileSettings = async () => {
   let settings = await SettingsModel.findOne({
     key: settingsKeys.MOBILE,
-  }).lean();
+  }).lean({ visrtuals: true });
 
   if (!settings) throw new ApiError(errorCodes.NO_SETTINGS_FOUND);
+
+  // Set country name
+  // @TODO: handle language
+  settings = {
+    ...settings,
+    countries: settings.countries?.map((c) => ({ ...c, countryName: countries[c.countryCode]["ar"] })),
+  };
+
+  // Override 'id' from virtual --> virtual not working
+  settings.id = settings._id;
 
   return settings;
 };
@@ -17,7 +26,9 @@ const getMobileSettings = async () => {
 const listFeaturedVendors = async () => {
   const settings = await SettingsModel.findOne({
     key: settingsKeys.FEATURED_VENDORS,
-  }).populate("featuredVendors", "-firebaseToken -password -userType");
+  })
+    .populate("featuredVendors", "-firebaseToken -password -userType")
+    .lean({ virtuals: true });
 
   if (!settings) throw new ApiError(errorCodes.NO_SETTINGS_FOUND);
   return settings.featuredVendors;

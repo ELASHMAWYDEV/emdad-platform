@@ -52,7 +52,11 @@ const TransportationOfferSchema = new Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-TransportationOfferSchema.virtual("id").get(() => {
+TransportationOfferSchema.virtual("id").get(function () {
+  return this._id;
+});
+
+denormalizedTransportationOfferSchema.virtual("id").get(function () {
   return this._id;
 });
 

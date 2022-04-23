@@ -4,6 +4,7 @@ const SupplyService = require("../../services/supply");
 const ProductService = require("../../services/product");
 const TransportationService = require("../../services/transportation");
 const { userTypes } = require("../../../../models/constants");
+const FavouriteModel = require("../../../../models/Favourite");
 
 const getHomeData = async (req, res, next) => {
   try {
@@ -11,6 +12,31 @@ const getHomeData = async (req, res, next) => {
     const favouriteVendors =
       req.user.userType == userTypes.GUEST ? [] : await UserService.getFavouriteVendors(req.user._id);
     const featuredVendors = await SettingsService.listFeaturedVendors();
+
+    // @TODO: refactor this to come from the aggregation
+    // Get ratings for each vendor
+    // const newVendors = vendors.map(async (vendor) => {
+    //   const { ratings, overAllRating } = await getVendorRatings({
+    //     vendorId: vendor._id,
+    //   });
+    //   return { ...vendor, ratings, overAllRating };
+    // });
+
+    // console.log({ newVendors });
+
+    // const newFavouriteVendors = favouriteVendors.map(async (vendor) => {
+    //   const { ratings, overAllRating } = await getVendorRatings({
+    //     vendorId: vendor._id,
+    //   });
+    //   return { ...vendor, ratings, overAllRating };
+    // });
+
+    // const newFeaturedVendors = featuredVendors.map(async (vendor) => {
+    //   const { ratings, overAllRating } = await getVendorRatings({
+    //     vendorId: vendor._id,
+    //   });
+    //   return { ...vendor, ratings, overAllRating };
+    // });
 
     return res.json({
       status: true,
@@ -47,6 +73,18 @@ const getVendorInfo = async (req, res, next) => {
   try {
     const { vendorId } = req.params;
     const result = await UserService.getVendorInfo(vendorId);
+
+    // Check if he is favourite
+    const favourites =
+      req.user.userType == userTypes.GUEST
+        ? []
+        : await FavouriteModel.findOne({
+            userId: req?.user?._id.toString(),
+          });
+
+    if (favourites.favouriteVendors.indexOf(result?.vendorInfo?._id.toString()) !== -1) {
+      result.vendorInfo.isFavourite = true;
+    }
 
     return res.json({
       status: true,
@@ -168,8 +206,8 @@ const acceptSupplyRequest = async (req, res, next) => {
 
 const listSupplyRequests = async (req, res, next) => {
   try {
-    const { paginationToken } = req.query;
-    const result = await SupplyService.listSupplyRequests({ userId: req.user._id, paginationToken });
+    const { paginationToken, limit } = req.query;
+    const result = await SupplyService.listSupplyRequests({ userId: req.user._id, paginationToken, limit });
 
     return res.json({
       status: true,

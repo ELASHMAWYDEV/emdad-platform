@@ -128,7 +128,7 @@ UserSchema.virtual("logoUrl").get(function () {
 });
 
 UserSchema.virtual("locationObject").get(function () {
-  return { lat: this.location.coordinates[1], lng: this.location.coordinates[0] };
+  return { lat: this?.location?.coordinates[1], lng: this?.location?.coordinates[0] };
 });
 
 UserSchema.plugin(mongooseLeanVirtuals);

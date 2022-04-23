@@ -71,8 +71,38 @@ const SupplyRequestSchema = new Schema(
   }
 );
 
-SupplyRequestSchema.virtual("id").get(() => {
+SupplyRequestSchema.virtual("id").get(function () {
   return this._id;
+});
+
+SupplyRequestSchema.virtual("user", {
+  ref: "User",
+  localField: "userId",
+  foreignField: "_id",
+  justOne: true,
+  options: {
+    select: "_id name city country oraganizationName logo location",
+  },
+});
+
+SupplyRequestSchema.virtual("vendor", {
+  ref: "User",
+  localField: "vendorId",
+  foreignField: "_id",
+  justOne: true,
+  options: {
+    select: "_id name city country oraganizationName logo location",
+  },
+});
+
+SupplyRequestSchema.virtual("transportationRequest", {
+  ref: "TransportationRequest",
+  localField: "transportationRequestId",
+  foreignField: "_id",
+  justOne: true,
+  options: {
+    select: "_id transportationMethod transportationStatus transportationOffer",
+  },
 });
 
 SupplyRequestSchema.plugin(mongooseLeanVirtuals);

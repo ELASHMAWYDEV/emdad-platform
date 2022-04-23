@@ -33,7 +33,7 @@ const RatingSchema = new Schema(
   }
 );
 
-RatingSchema.virtual("id").get(() => {
+RatingSchema.virtual("id").get(function () {
   return this._id;
 });
 

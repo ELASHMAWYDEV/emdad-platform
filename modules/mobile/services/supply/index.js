@@ -1,77 +1,24 @@
-const { Types } = require("mongoose");
 const SupplyRequestModel = require("../../../../models/SupplyRequest");
 const UserModel = require("../../../../models/User");
-const { supplyRequestStatus, userTypes } = require("../../../../models/constants");
+const { supplyRequestStatus, userTypes, ObjectId } = require("../../../../models/constants");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas");
 const CustomError = require("../../../../errors/CustomError");
-const { WEBSITE_URL } = require("../../../../globals");
 
-const listSupplyRequests = async ({ userId = null, vendorId = null, paginationToken = null, _id }) => {
-  const supplyRequests = await SupplyRequestModel.aggregate([
-    {
-      $match: {
-        ...(_id && { _id: new Types.ObjectId(_id) }),
-        ...(paginationToken && {
-          _id: {
-            $gt: paginationToken,
-          },
-        }),
-        ...(userId && { userId }),
-        ...(vendorId && { vendorId }),
+const listSupplyRequests = async ({ userId = null, vendorId = null, paginationToken = null, limit = 10, _id }) => {
+  const supplyRequests = await SupplyRequestModel.find({
+    ...(_id && { _id: ObjectId(_id) }),
+    ...(paginationToken && {
+      _id: {
+        $gt: paginationToken,
       },
-    },
-    { $limit: 15 },
-    {
-      $lookup: {
-        from: "users",
-        let: { userId: "$userId" },
-        pipeline: [
-          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-          {
-            $project: {
-              _id: 1,
-              name: 1,
-              vendorType: 1,
-              country: 1,
-              city: 1,
-              location: 1,  
-              oraganizationName: 1,
-              logo: 1,
-            },
-          },
-        ],
-        as: "user",
-      },
-    },
-    {
-      $unwind: "$user",
-    },
-    {
-      $lookup: {
-        from: "users",
-        let: { vendroId: "$vendorId" },
-        pipeline: [
-          { $match: { $expr: { $eq: ["$_id", "$$vendroId"] } } },
-          {
-            $project: {
-              _id: 1,
-              name: 1,
-              country: 1,
-              city: 1,
-              location: 1,
-              oraganizationName: 1,
-              logo: 1,
-            },
-          },
-        ],
-        as: "vendor",
-      },
-    },
-    {
-      $unwind: "$vendor",
-    },
-  ]);
+    }),
+    ...(userId && { userId }),
+    ...(vendorId && { vendorId }),
+  })
+    .limit(parseInt(limit.toString()))
+    .populate("user vendor transportationRequest")
+    .lean({ virtuals: true });
 
   return supplyRequests;
 };
