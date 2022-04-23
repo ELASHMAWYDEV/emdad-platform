@@ -44,8 +44,18 @@ const TransportationRequestSchema = new Schema(
   }
 );
 
-TransportationRequestSchema.virtual("id").get(() => {
+TransportationRequestSchema.virtual("id").get(function () {
   return this._id;
+});
+
+TransportationRequestSchema.virtual("transportationRequest", {
+  ref: "TransportationRequest",
+  localField: "transportationRequestId",
+  foreignField: "_id",
+  justOne: true,
+  options: {
+    select: "_id transportationMethod transportationStatus transportationOffer",
+  },
 });
 
 TransportationRequestSchema.plugin(mongooseLeanVirtuals);
