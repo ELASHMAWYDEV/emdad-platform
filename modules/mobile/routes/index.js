@@ -35,6 +35,7 @@ router.post("/profile/email", checkToken, profileController.editEmail);
 router.get("/user/home", checkToken, guestMiddleware, userMiddleware, userController.getHomeData);
 
 router.get("/user/vendors", checkToken, guestMiddleware, userMiddleware, userController.getListOfVendors);
+router.get("/user/vendors/favourite", checkToken, guestMiddleware, userMiddleware, userController.getListOfFavouriteVendors);
 router.get("/user/vendors/:vendorId", checkToken, guestMiddleware, userMiddleware, userController.getVendorInfo);
 router.post("/user/vendors/:vendorId/favourite", checkToken, userMiddleware, userController.toggleVendorToFavourites);
 router.post("/user/vendors/:vendorId/rate", checkToken, userMiddleware, userController.rateVendor);

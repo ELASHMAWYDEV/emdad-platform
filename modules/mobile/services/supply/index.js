@@ -5,9 +5,8 @@ const { supplyRequestStatus, userTypes } = require("../../../../models/constants
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas");
 const CustomError = require("../../../../errors/CustomError");
-const { WEBSITE_URL } = require("../../../../globals");
 
-const listSupplyRequests = async ({ userId = null, vendorId = null, paginationToken = null, _id }) => {
+const listSupplyRequests = async ({ userId = null, vendorId = null, paginationToken = null, _id, requestStatus }) => {
   const supplyRequests = await SupplyRequestModel.aggregate([
     {
       $match: {
@@ -19,6 +18,7 @@ const listSupplyRequests = async ({ userId = null, vendorId = null, paginationTo
         }),
         ...(userId && { userId }),
         ...(vendorId && { vendorId }),
+        ...(requestStatus && { requestStatus }),
       },
     },
     { $limit: 15 },
@@ -35,7 +35,7 @@ const listSupplyRequests = async ({ userId = null, vendorId = null, paginationTo
               vendorType: 1,
               country: 1,
               city: 1,
-              location: 1,  
+              location: 1,
               oraganizationName: 1,
               logo: 1,
             },
@@ -96,6 +96,7 @@ const createSupplyRequest = validateSchema(schemas.createSupplyRequestSchema)(as
 
   const generatedId = `MD_${totalSupplyRequests + 10000}`;
 
+  console.log({ generatedId });
   // Create the supply request first
   const result = await SupplyRequestModel.create({
     ...supplyRequest,

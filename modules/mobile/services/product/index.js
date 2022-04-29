@@ -23,6 +23,7 @@ const listProducts = async ({
   productType = [],
   paginationToken = null,
   limit = 10,
+  searchQuery,
 }) => {
   const products = await ProductModel.aggregate([
     {
@@ -34,6 +35,7 @@ const listProducts = async ({
         }),
         ...(productType.length !== 0 && { productType: { $in: productType } }),
         vendorId: ObjectId(vendorId),
+        ...(searchQuery && { name: { $regex: ".*" + searchQuery + ".*" } }),
       },
     },
     {
