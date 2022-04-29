@@ -6,6 +6,13 @@ const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas.js");
 const CustomError = require("../../../../errors/CustomError");
 
+const getUserProfile = async (userId) => {
+  const profile = await UserModel.findById(userId).select("-firebaseToken -password").lean({ virtuals: true });
+
+  if (!profile) throw new Error("الملف الشخصي الذي تبحث عنه غير موجود");
+  return profile;
+};
+
 const completeUserProfile = validateSchema(schemas.completeProfileSchema)(async ({ _id, location, ...user }) => {
   // Validation on logo
   if (user.logo && !/\w+-\w+-\w+-\w+-\w+\.\w+/.test(user.logo))
@@ -112,6 +119,7 @@ const editUserEmail = validateSchema(schemas.editEmailSchema)(async ({ _id, oldE
 });
 
 module.exports = {
+  getUserProfile,
   completeUserProfile,
   editUserProfile,
   editUserPassword,

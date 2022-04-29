@@ -69,6 +69,22 @@ const getListOfVendors = async (req, res, next) => {
   }
 };
 
+const getListOfFavouriteVendors = async (req, res, next) => {
+  try {
+    const result = await UserService.getFavouriteVendors(req.user._id);
+
+    return res.json({
+      status: true,
+      message: "تم استرجاع الموردين المفضلين بنجاح",
+      data: {
+        favouriteVendors: result,
+      },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const getVendorInfo = async (req, res, next) => {
   try {
     const { vendorId } = req.params;
@@ -206,8 +222,13 @@ const acceptSupplyRequest = async (req, res, next) => {
 
 const listSupplyRequests = async (req, res, next) => {
   try {
-    const { paginationToken, limit } = req.query;
-    const result = await SupplyService.listSupplyRequests({ userId: req.user._id, paginationToken, limit });
+    const { paginationToken, requestStatus, limit } = req.query;
+    const result = await SupplyService.listSupplyRequests({
+      userId: req.user._id,
+      paginationToken,
+      limit,
+      requestStatus,
+    });
 
     return res.json({
       status: true,
@@ -271,6 +292,7 @@ const acceptTransportationOffer = async (req, res, next) => {
 module.exports = {
   getHomeData,
   getListOfVendors,
+  getListOfFavouriteVendors,
   getVendorInfo,
   getVendorProducts,
   getProductInfo,

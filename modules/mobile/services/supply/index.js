@@ -5,7 +5,14 @@ const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas");
 const CustomError = require("../../../../errors/CustomError");
 
-const listSupplyRequests = async ({ userId = null, vendorId = null, paginationToken = null, limit = 10, _id }) => {
+const listSupplyRequests = async ({
+  userId = null,
+  vendorId = null,
+  paginationToken = null,
+  limit = 10,
+  _id,
+  requestStatus,
+}) => {
   const supplyRequests = await SupplyRequestModel.find({
     ...(_id && { _id: ObjectId(_id) }),
     ...(paginationToken && {
@@ -15,6 +22,7 @@ const listSupplyRequests = async ({ userId = null, vendorId = null, paginationTo
     }),
     ...(userId && { userId }),
     ...(vendorId && { vendorId }),
+    ...(requestStatus && { requestStatus }),
   })
     .limit(parseInt(limit.toString()))
     .populate("user vendor transportationRequest")
@@ -43,6 +51,7 @@ const createSupplyRequest = validateSchema(schemas.createSupplyRequestSchema)(as
 
   const generatedId = `MD_${totalSupplyRequests + 10000}`;
 
+  console.log({ generatedId });
   // Create the supply request first
   const result = await SupplyRequestModel.create({
     ...supplyRequest,

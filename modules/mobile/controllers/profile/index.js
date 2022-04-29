@@ -1,5 +1,19 @@
 const ProfileService = require("../../services/profile");
 
+const getUserProfile = async (req, res, next) => {
+  try {
+    const result = await ProfileService.getUserProfile(req.user._id);
+
+    return res.json({
+      status: true,
+      message: "تم استرجاع بيانات حسابك بنجاح",
+      data: { user: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const completeProfile = async (req, res, next) => {
   try {
     const userData = req.body;
@@ -20,7 +34,6 @@ const completeProfile = async (req, res, next) => {
 
 const editProfile = async (req, res, next) => {
   try {
-    console.log(req.hostname, req.protocol);
     const userData = req.body;
     const result = await ProfileService.editUserProfile({
       ...userData,
@@ -76,6 +89,7 @@ const editEmail = async (req, res, next) => {
 };
 
 module.exports = {
+  getUserProfile,
   completeProfile,
   editProfile,
   editPassword,
