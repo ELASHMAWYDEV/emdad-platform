@@ -51,6 +51,9 @@ module.exports = {
       country: {
         type: "string",
       },
+      includeRatings: {
+        type: "boolean",
+      },
     },
   },
   rateTargetSchema: {

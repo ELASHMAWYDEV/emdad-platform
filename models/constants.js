@@ -17,6 +17,11 @@ const countryCodes = {
   EG: "+20",
 };
 
+const countries = {
+  SA: { ar: "السعودية", en: "Saudi Arabia" },
+  EG: { ar: "مصر", en: "Egypt" },
+};
+
 const settingsKeys = {
   MOBILE: "mobileSettings",
   FEATURED_VENDORS: "featuredVendors",
@@ -55,6 +60,7 @@ module.exports = {
   userTypes,
   supportedLanguages,
   countryCodes,
+  countries,
   settingsKeys,
   supplyRequestStatus,
   transportationStatus,
