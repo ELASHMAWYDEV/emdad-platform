@@ -26,6 +26,7 @@ router.post("/auth/otp/resend", checkToken, authenticationController.resendOtp);
 router.post("/auth/registerGuest", authenticationController.registerGuest);
 
 // Profile
+router.get("/profile", checkToken, profileController.getUserProfile);
 router.post("/profile/complete", checkToken, profileController.completeProfile);
 router.post("/profile/edit", checkToken, profileController.editProfile);
 router.post("/profile/password", checkToken, profileController.editPassword);
