@@ -15,36 +15,37 @@ const getHomeData = async (req, res, next) => {
 
     // @TODO: refactor this to come from the aggregation
     // Get ratings for each vendor
-    // const newVendors = vendors.map(async (vendor) => {
-    //   const { ratings, overAllRating } = await getVendorRatings({
-    //     vendorId: vendor._id,
-    //   });
-    //   return { ...vendor, ratings, overAllRating };
-    // });
+    let vendorsWithRatings = [];
+    for (let vendor of vendors) {
+      const { ratings, overAllRating } = await UserService.getVendorRatings({
+        vendorId: vendor._id,
+      });
+      vendorsWithRatings = [...vendorsWithRatings, { ...vendor, ratings, overAllRating }];
+    }
 
-    // console.log({ newVendors });
+    let favouriteVendorsWithRatings = [];
+    for (let vendor of favouriteVendors) {
+      const { ratings, overAllRating } = await UserService.getVendorRatings({
+        vendorId: vendor._id,
+      });
+      favouriteVendorsWithRatings = [...favouriteVendorsWithRatings, { ...vendor, ratings, overAllRating }];
+    }
 
-    // const newFavouriteVendors = favouriteVendors.map(async (vendor) => {
-    //   const { ratings, overAllRating } = await getVendorRatings({
-    //     vendorId: vendor._id,
-    //   });
-    //   return { ...vendor, ratings, overAllRating };
-    // });
-
-    // const newFeaturedVendors = featuredVendors.map(async (vendor) => {
-    //   const { ratings, overAllRating } = await getVendorRatings({
-    //     vendorId: vendor._id,
-    //   });
-    //   return { ...vendor, ratings, overAllRating };
-    // });
+    let featuredVendorsWithRatings = [];
+    for (let vendor of featuredVendors) {
+      const { ratings, overAllRating } = await UserService.getVendorRatings({
+        vendorId: vendor._id,
+      });
+      featuredVendorsWithRatings = [...featuredVendorsWithRatings, { ...vendor, ratings, overAllRating }];
+    }
 
     return res.json({
       status: true,
       message: "تم استرجاع البيانات بنجاح",
       data: {
-        vendors,
-        favouriteVendors,
-        featuredVendors,
+        vendors: vendorsWithRatings,
+        favouriteVendors: favouriteVendorsWithRatings,
+        featuredVendors: featuredVendorsWithRatings,
       },
     });
   } catch (e) {
@@ -289,6 +290,21 @@ const acceptTransportationOffer = async (req, res, next) => {
   }
 };
 
+const getTransportationOfferInfo = async (req, res, next) => {
+  try {
+    const { transportationOfferId } = req.params;
+    const result = await TransportationService.getTransportationOfferInfo(transportationOfferId);
+
+    return res.json({
+      status: true,
+      message: "تم استرجاع البيانات بنجاح",
+      data: { transportationOffer: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   getHomeData,
   getListOfVendors,
@@ -305,4 +321,5 @@ module.exports = {
   acceptSupplyRequest,
   createTransportationRequest,
   acceptTransportationOffer,
+  getTransportationOfferInfo,
 };

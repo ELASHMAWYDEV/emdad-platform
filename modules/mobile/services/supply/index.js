@@ -22,7 +22,7 @@ const listSupplyRequests = async ({
     }),
     ...(userId && { userId }),
     ...(vendorId && { vendorId }),
-    ...(requestStatus && { requestStatus }),
+    ...(requestStatus && { requestStatus: { $in: [].concat(requestStatus) } }),
   })
     .limit(parseInt(limit.toString()))
     .populate("user vendor transportationRequest")
@@ -57,6 +57,7 @@ const createSupplyRequest = validateSchema(schemas.createSupplyRequestSchema)(as
     ...supplyRequest,
     transportationHandler: supplyRequest.isTransportationNeeded ? userTypes.VENDOR : userTypes.USER,
     generatedId,
+    [`statusChangeLog.${supplyRequestStatus.AWAITING_QUOTATION}`]: new Date(),
   });
 
   const createdSupplyRequest = await getSupplyRequestInfo(result._id);
@@ -155,6 +156,7 @@ const quoteSupplyRequest = validateSchema(schemas.quoteSupplyRequestSchema)(
             $set: {
               requestStatus: supplyRequestStatus.AWAITING_APPROVAL,
               estimationInSeconds: quotation.estimationInSeconds,
+              [`statusChangeLog.${supplyRequestStatus.AWAITING_APPROVAL}`]: new Date(),
               ...(quotation.transportationPrice &&
                 supplyRequestSearch.transportationHandler == userTypes.VENDOR && {
                   transportationPrice: quotation.transportationPrice,
@@ -187,7 +189,12 @@ const acceptSupplyRequest = async (supplyRequestId) => {
   // Update the supply request
   await SupplyRequestModel.updateOne(
     { _id: supplyRequestId },
-    { $set: { requestStatus: supplyRequestStatus.PREPARING } }
+    {
+      $set: {
+        requestStatus: supplyRequestStatus.PREPARING,
+        [`statusChangeLog.${supplyRequestStatus.PREPARING}`]: new Date(),
+      },
+    }
   );
 
   const updatedSupplyRequest = await getSupplyRequestInfo(supplyRequestId);

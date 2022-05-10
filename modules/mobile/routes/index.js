@@ -36,7 +36,13 @@ router.post("/profile/email", checkToken, profileController.editEmail);
 router.get("/user/home", checkToken, guestMiddleware, userMiddleware, userController.getHomeData);
 
 router.get("/user/vendors", checkToken, guestMiddleware, userMiddleware, userController.getListOfVendors);
-router.get("/user/vendors/favourite", checkToken, guestMiddleware, userMiddleware, userController.getListOfFavouriteVendors);
+router.get(
+  "/user/vendors/favourite",
+  checkToken,
+  guestMiddleware,
+  userMiddleware,
+  userController.getListOfFavouriteVendors
+);
 router.get("/user/vendors/:vendorId", checkToken, guestMiddleware, userMiddleware, userController.getVendorInfo);
 router.post("/user/vendors/:vendorId/favourite", checkToken, userMiddleware, userController.toggleVendorToFavourites);
 router.post("/user/vendors/:vendorId/rate", checkToken, userMiddleware, userController.rateVendor);
@@ -87,6 +93,12 @@ router.post(
   userMiddleware,
   userController.acceptTransportationOffer
 );
+router.get(
+  "/user/transportationOffers/:transportationOfferId",
+  checkToken,
+  userMiddleware,
+  userController.getTransportationOfferInfo
+);
 // router.get("/user/transportationRequests", checkToken, userMiddleware, tempResponse);
 router.get("/user/transportationRequests/:transportationRequestId", checkToken, userMiddleware, tempResponse);
 router.post("/user/transportationRequests/:transportationRequestId/resend", checkToken, userMiddleware, tempResponse);
@@ -129,6 +141,12 @@ router.post(
   checkToken,
   vendorMiddleware,
   vendorController.acceptTransportationOffer
+);
+router.get(
+  "/vendor/transportationOffers/:transportationOfferId",
+  checkToken,
+  vendorMiddleware,
+  vendorController.getTransportationOfferInfo
 );
 router.post("/vendor/transportationOffers/:transportationOfferId/pay", checkToken, vendorMiddleware, tempResponse);
 router.get("/vendor/transportationOffers/paymentStatus/success", checkToken, vendorMiddleware, tempResponse);

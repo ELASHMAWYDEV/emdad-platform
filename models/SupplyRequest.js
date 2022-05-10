@@ -63,6 +63,9 @@ const SupplyRequestSchema = new Schema(
     estimationInSeconds: {
       type: Number,
     },
+    statusChangeLog: {
+      type: Object,
+    },
   },
   {
     timestamps: true,

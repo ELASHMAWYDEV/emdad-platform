@@ -31,6 +31,21 @@ module.exports = {
               productUnit: {
                 type: "string",
               },
+              units: {
+                type: "array",
+                minItems: 1,
+                items: [
+                  {
+                    type: "object",
+                    required: ["productUnit", "pricePerUnit", "minimumAmountPerOrder"],
+                    properties: {
+                      productUnit: { type: "string" },
+                      pricePerUnit: { type: "number" },
+                      minimumAmountPerOrder: { type: "number" },
+                    },
+                  },
+                ],
+              },
             },
           },
         ],
