@@ -38,8 +38,13 @@ const quoteSupplyRequest = async (req, res, next) => {
 
 const listSupplyRequests = async (req, res, next) => {
   try {
-    const { paginationToken } = req.query;
-    const result = await SupplyService.listSupplyRequests({ vendorId: req.user._id, paginationToken });
+    const { paginationToken, limit, requestStatus } = req.query;
+    const result = await SupplyService.listSupplyRequests({
+      vendorId: req.user._id,
+      paginationToken,
+      limit,
+      requestStatus,
+    });
 
     return res.json({
       status: true,
@@ -150,6 +155,21 @@ const acceptTransportationOffer = async (req, res, next) => {
   }
 };
 
+const getTransportationOfferInfo = async (req, res, next) => {
+  try {
+    const { transportationOfferId } = req.params;
+    const result = await TransportationService.getTransportationOfferInfo(transportationOfferId);
+
+    return res.json({
+      status: true,
+      message: "تم استرجاع البيانات بنجاح",
+      data: { transportationOffer: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   addProduct,
   quoteSupplyRequest,
@@ -160,4 +180,5 @@ module.exports = {
   createTransportationRequest,
   listTransportationOffers,
   acceptTransportationOffer,
+  getTransportationOfferInfo,
 };

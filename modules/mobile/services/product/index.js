@@ -35,7 +35,12 @@ const listProducts = async ({
         }),
         ...(productType.length !== 0 && { productType: { $in: productType } }),
         vendorId: ObjectId(vendorId),
-        ...(searchQuery && { name: { $regex: ".*" + searchQuery + ".*" } }),
+        ...(searchQuery && {
+          $or: [
+            { name: { $regex: ".*" + searchQuery + ".*" } },
+            { description: { $regex: ".*" + searchQuery + ".*" } },
+          ],
+        }),
       },
     },
     {

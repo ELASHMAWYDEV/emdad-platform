@@ -19,6 +19,26 @@ const denormalizedProductSchema = new Schema({
     type: Number,
     default: null,
   },
+  units: {
+    type: [
+      {
+        productUnit: {
+          type: String,
+          required: true,
+        },
+        pricePerUnit: {
+          type: Number,
+          required: true,
+        },
+        minimumAmountPerOrder: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
+    minlength: 1,
+    required: true,
+  },
 });
 
 const ProductSchema = new Schema(
@@ -57,6 +77,8 @@ const ProductSchema = new Schema(
           },
         },
       ],
+      minlength: 1,
+      required: true,
     },
     isPriceShown: {
       type: Boolean,
