@@ -1,6 +1,7 @@
 const { validateSchema } = require("../../../../middlewares/schema");
 const TransportationRequestModel = require("../../../../models/TransportationRequest");
 const TransportationOfferModel = require("../../../../models/TransportationOffer");
+const UserModel = require("../../../../models/User");
 const SupplyRequestModel = require("../../../../models/SupplyRequest");
 const schemas = require("./schemas");
 const supplyService = require("../supply");
@@ -296,7 +297,7 @@ const listTransportationOffers = async ({
     },
   ]);
 
-  return transportationOffers;
+  return transportationOffers.map((offer) => ({ ...offer, transporter: new UserModel(offer.transporter).toJSON() }));
 };
 
 const getTransportationOfferInfo = async (transportationOfferId) => {

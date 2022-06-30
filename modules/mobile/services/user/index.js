@@ -148,13 +148,13 @@ const getVendorRatings = async ({ vendorId, paginationToken = null, limit = 10 }
 const getProductInfo = async (productId) => {
   const product = await ProductModel.findOne({
     _id: new Types.ObjectId(productId),
-  }).lean();
+  }).lean({ virtuals: true });
 
   if (!product) throw new ApiError(errorCodes.PRODUCT_NOT_FOUND);
 
   return {
     ...product,
-    images: product?.images?.map((img) => `${WEBSITE_URL}/images/products/${img}`),
+    // images: product?.images?.map((img) => `${WEBSITE_URL}/images/products/${img}`),
   };
 };
 

@@ -1,7 +1,6 @@
 const ProductModel = require("../../../../models/Product");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas.js");
-const { WEBSITE_URL } = require("../../../../globals");
 const CustomError = require("../../../../errors/CustomError");
 const { ObjectId } = require("../../../../models/constants");
 
@@ -17,6 +16,24 @@ const addProduct = validateSchema(schemas.addProductSchema)(async (product) => {
   return createdProduct;
 });
 
+const editProduct = validateSchema(schemas.editProductSchema)(async ({ productId, ...product }) => {
+  // Validation on images
+  for (let image of product.images) {
+    if (!/\w+-\w+-\w+-\w+-\w+\.\w+/.test(image))
+      throw new CustomError("NOT_ALL_IMAGES_UPLOADED", "الصور التي ارسلتها  لم تقم برفعها كلها");
+  }
+
+  const updatedProduct = await ProductModel.findOneAndUpdate(
+    { _id: ObjectId(productId) },
+    { $set: { ...product } },
+    { new: true }
+  ).lean({
+    virtuals: true,
+  });
+
+  return updatedProduct;
+});
+
 const listProducts = async ({
   vendorId,
   categorized = false,
@@ -25,28 +42,20 @@ const listProducts = async ({
   limit = 10,
   searchQuery,
 }) => {
-  const products = await ProductModel.aggregate([
-    {
-      $match: {
-        ...(paginationToken && {
-          _id: {
-            $gt: paginationToken,
-          },
-        }),
-        ...(productType.length !== 0 && { productType: { $in: productType } }),
-        vendorId: ObjectId(vendorId),
-        ...(searchQuery && {
-          $or: [
-            { name: { $regex: ".*" + searchQuery + ".*" } },
-            { description: { $regex: ".*" + searchQuery + ".*" } },
-          ],
-        }),
+  const products = await ProductModel.find({
+    ...(paginationToken && {
+      _id: {
+        $gt: paginationToken,
       },
-    },
-    {
-      $limit: limit,
-    },
-  ]);
+    }),
+    ...(productType.length !== 0 && { productType: { $in: productType } }),
+    vendorId: ObjectId(vendorId),
+    ...(searchQuery && {
+      $or: [{ name: { $regex: ".*" + searchQuery + ".*" } }, { description: { $regex: ".*" + searchQuery + ".*" } }],
+    }),
+  })
+    .limit(Number(limit))
+    .lean({ virtuals: true });
 
   let productCategories;
   if (categorized && productType.length === 0) {
@@ -59,9 +68,8 @@ const listProducts = async ({
     return {
       categories: productCategories.map((category) => ({
         category: category,
-        products: products
-          .filter((p) => p.productType.includes(category))
-          .map((p) => ({ ...p, images: p.images.map((img) => `${WEBSITE_URL}/images/products/${img}`) })),
+        products: products.filter((p) => p.productType.includes(category)),
+        // .map((p) => ({ ...p, images: p.images.map((img) => `${WEBSITE_URL}/images/products/${img}`) })),
       })),
     };
   } else {
@@ -78,6 +86,7 @@ const getProductDetails = async (productId) => {
 
 module.exports = {
   addProduct,
+  editProduct,
   listProducts,
   getProductDetails,
 };

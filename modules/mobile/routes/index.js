@@ -155,7 +155,7 @@ router.get("/vendor/transportationOffers/paymentStatus/failure", checkToken, ven
 router.put("/vendor/products", checkToken, vendorMiddleware, vendorController.addProduct);
 router.get("/vendor/products", checkToken, vendorMiddleware, vendorController.listProducts);
 router.get("/vendor/products/:productId", checkToken, vendorMiddleware, vendorController.getProductDetails);
-router.post("/vendor/products/:productId", checkToken, vendorMiddleware, tempResponse);
+router.post("/vendor/products/:productId", checkToken, vendorMiddleware, vendorController.editProduct);
 
 //Transporter
 router.get(

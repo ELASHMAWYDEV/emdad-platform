@@ -20,6 +20,21 @@ const addProduct = async (req, res, next) => {
   }
 };
 
+const editProduct = async (req, res, next) => {
+  try {
+    const product = req.body;
+    const result = await ProductService.editProduct(product);
+
+    return res.json({
+      status: true,
+      message: "تم تعديل المنتج بنجاح",
+      data: { product: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const quoteSupplyRequest = async (req, res, next) => {
   try {
     const quotation = req.body;
@@ -172,6 +187,7 @@ const getTransportationOfferInfo = async (req, res, next) => {
 
 module.exports = {
   addProduct,
+  editProduct,
   quoteSupplyRequest,
   listSupplyRequests,
   getSupplyRequestInfo,
