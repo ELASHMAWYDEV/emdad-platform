@@ -172,8 +172,15 @@ const createTransportationRequest = validateSchema(schemas.createTransportationR
       );
     }
 
+    // Generate the custom id
+    const totalTransportationRequests = await SupplyRequestModel.countDocuments();
+
+    const generatedId = `TD_${totalTransportationRequests + 10000}`;
+
+    console.log({ generatedId });
+
     // Create the transportation request
-    const createdRequest = await TransportationRequestModel.create(transportationRequest);
+    const createdRequest = await TransportationRequestModel.create({ ...transportationRequest, generatedId });
 
     // Add the transportationRequestId to the supply request
     await SupplyRequestModel.updateOne(

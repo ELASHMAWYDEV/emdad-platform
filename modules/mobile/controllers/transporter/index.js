@@ -2,10 +2,11 @@ const TransportationService = require("../../services/transportation");
 
 const listTransportationRequests = async (req, res, next) => {
   try {
-    const { paginationToken, limit } = req.query;
+    const { paginationToken, limit, transportationStatus } = req.query;
     const result = await TransportationService.listTransportationRequests({
       paginationToken,
       limit,
+      transportationStatus,
       city: req.user.city,
     });
 
@@ -40,7 +41,7 @@ const listAcceptedTransportationRequests = async (req, res, next) => {
     const result = await TransportationService.listTransportationRequests({
       paginationToken,
       limit,
-      transportationStatus,
+      transportationStatus: transportationStatus || { $nin: ["awaitingOffers", "delivered"] },
       transporterId: req.user._id,
     });
 

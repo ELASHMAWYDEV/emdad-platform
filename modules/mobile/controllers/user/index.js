@@ -99,7 +99,7 @@ const getVendorInfo = async (req, res, next) => {
             userId: req?.user?._id.toString(),
           });
 
-    if (favourites.favouriteVendors.indexOf(result?.vendorInfo?._id.toString()) !== -1) {
+    if (favourites.favouriteVendors?.indexOf(result?.vendorInfo?._id.toString()) !== -1) {
       result.vendorInfo.isFavourite = true;
     }
 

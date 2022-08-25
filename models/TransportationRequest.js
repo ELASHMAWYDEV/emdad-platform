@@ -5,6 +5,11 @@ const { denormalizedTransportationOfferSchema } = require("./TransportationOffer
 
 const TransportationRequestSchema = new Schema(
   {
+    generatedId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     requesterType: {
       type: String,
       required: true,
