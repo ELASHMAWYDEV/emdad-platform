@@ -16,7 +16,7 @@ const listTransportationRequests = async ({
   paginationToken = null,
   limit = 15,
   requesterId = null,
-  city = "",
+  cities = [],
   transportationStatus = "",
   transporterId = null,
 }) => {
@@ -34,8 +34,8 @@ const listTransportationRequests = async ({
         ...(requesterId && {
           requesterId: new Types.ObjectId(requesterId),
         }),
-        ...(city && {
-          city,
+        ...(cities.length != 0 && {
+          cities: { $in: cities },
         }),
         ...(transportationStatus && { transportationStatus }),
         ...(transporterId && {

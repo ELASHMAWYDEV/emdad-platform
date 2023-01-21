@@ -37,8 +37,8 @@ const TransportationRequestSchema = new Schema(
       default: transportationStatus.AWAITING_OFFERS,
     },
     transportationOffer: { type: denormalizedTransportationOfferSchema },
-    city: {
-      type: String,
+    cities: {
+      type: [String],
       required: true,
     },
   },

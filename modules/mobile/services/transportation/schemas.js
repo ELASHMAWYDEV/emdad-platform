@@ -3,7 +3,7 @@ const { userTypes } = require("../../../../models/constants");
 module.exports = {
   createTransportationRequestSchema: {
     type: "object",
-    required: ["requesterId", "requesterType", "supplyRequestId", "transportationMethod", "city"],
+    required: ["requesterId", "requesterType", "supplyRequestId", "transportationMethod", "cities"],
     additionalProperties: false,
     properties: {
       requesterId: {
@@ -19,8 +19,13 @@ module.exports = {
       transportationMethod: {
         type: "string",
       },
-      city: {
-        type: "string",
+      cities: {
+        type: "array",
+        items: [
+          {
+            type: "string",
+          },
+        ],
       },
     },
   },
