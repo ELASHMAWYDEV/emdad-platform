@@ -84,7 +84,7 @@ SupplyRequestSchema.virtual("user", {
   foreignField: "_id",
   justOne: true,
   options: {
-    select: "_id name city country oraganizationName logo location",
+    select: "_id name city country oraganizationName logo location firebaseToken deviceType",
   },
 });
 
@@ -94,7 +94,7 @@ SupplyRequestSchema.virtual("vendor", {
   foreignField: "_id",
   justOne: true,
   options: {
-    select: "_id name city country oraganizationName logo location",
+    select: "_id name city country oraganizationName logo location firebaseToken deviceType",
   },
 });
 

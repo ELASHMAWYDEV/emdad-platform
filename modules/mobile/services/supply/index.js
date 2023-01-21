@@ -4,6 +4,7 @@ const { supplyRequestStatus, userTypes, ObjectId } = require("../../../../models
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas");
 const CustomError = require("../../../../errors/CustomError");
+const sendNotification = require("../../../../helpers/sendNotification");
 
 const listSupplyRequests = async ({
   userId = null,
@@ -61,7 +62,15 @@ const createSupplyRequest = validateSchema(schemas.createSupplyRequestSchema)(as
   });
 
   const createdSupplyRequest = await getSupplyRequestInfo(result._id);
-  // @TODO: send notification to the vendor
+  // Send notification to the vendor
+  sendNotification({
+    firebaseToken: createdSupplyRequest.vendor.firebaseToken,
+    deviceType: createdSupplyRequest.vendor.deviceType,
+    title: "تم انشاء طلب عرض سعر جديد",
+    body: `تم انشاء طلب عرض سعر جديد من قبل ${createdSupplyRequest.user.name}`,
+    type: 8,
+    data: createdSupplyRequest,
+  }).catch(console.log);
 
   return createdSupplyRequest;
 });
@@ -88,7 +97,15 @@ const resendSupplyRequest = validateSchema(schemas.resendSupplyRequestSchema)(as
   );
 
   const updatedSupplyRequest = await getSupplyRequestInfo(supplyRequest.supplyRequestId);
-  // @TODO: send notification to the vendor
+  // send notification to the vendor
+  sendNotification({
+    firebaseToken: updatedSupplyRequest.vendor.firebaseToken,
+    deviceType: updatedSupplyRequest.vendor.deviceType,
+    title: "تم استلام طلب عرض سعر جديد",
+    body: `تم استلام طلب عرض سعر جديد من قبل ${updatedSupplyRequest.user.name}`,
+    type: 7,
+    data: updatedSupplyRequest,
+  }).catch(console.log);
 
   return updatedSupplyRequest;
 });
@@ -172,7 +189,15 @@ const quoteSupplyRequest = validateSchema(schemas.quoteSupplyRequestSchema)(
     // Get the supply request after update
     const updatedSupplyRequest = await getSupplyRequestInfo(quotation.supplyRequestId);
 
-    // @TODO: send notification to the user
+    // send notification to the user
+    sendNotification({
+      firebaseToken: updatedSupplyRequest.user.firebaseToken,
+      deviceType: updatedSupplyRequest.user.deviceType,
+      title: "تم استلام عرض سعر جديد",
+      body: `تم استلام عرض سعر جديد من قبل ${updatedSupplyRequest.vendor.name}`,
+      type: 2,
+      data: updatedSupplyRequest,
+    }).catch(console.log);
 
     return updatedSupplyRequest;
   }
@@ -199,7 +224,15 @@ const acceptSupplyRequest = async (supplyRequestId) => {
 
   const updatedSupplyRequest = await getSupplyRequestInfo(supplyRequestId);
 
-  // @TODO: send notification to the vendor
+  // send notification to the vendor
+  sendNotification({
+    firebaseToken: updatedSupplyRequest.vendor.firebaseToken,
+    deviceType: updatedSupplyRequest.vendor.deviceType,
+    title: "تم الموافقة علي عرض سعرك",
+    body: `تم الموافقة علي عرض سعرك من قبل ${updatedSupplyRequest.user.name}`,
+    type: 9,
+    data: updatedSupplyRequest,
+  }).catch(console.log);
   return updatedSupplyRequest;
 };
 

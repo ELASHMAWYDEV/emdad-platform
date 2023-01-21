@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const CustomError = require('../errors/CustomError');
 
 module.exports = async ({
   firebaseToken,
@@ -14,35 +15,69 @@ module.exports = async ({
       return;
     }
 
-    let typeDescription = 'description';
+    let typeDescription = '';
     switch (type) {
-      case '1':
-        typeDescription = 'New Order Received';
+      case 1:
+        typeDescription = 'Dashboard Notification';
         break;
-      case '2':
-        typeDescription = 'Order Canceled';
+      case 2: // Done
+        typeDescription = 'User: Supply Offer';
         break;
-      case '3':
-        typeDescription = 'Disconnect Intervals';
+      case 3: // Done
+        typeDescription = 'User: Transportation Offer';
+        break;
+      case 4:
+        typeDescription = 'User: Order Status Change';
+        break;
+      case 5:
+        typeDescription = 'User: New Vendor Created';
+        break;
+      case 6:
+        typeDescription = 'User: Favourite Vendor Added New Product';
+        break;
+      case 7: // Done
+        typeDescription = 'Vendor: New Price Request';
+        break;
+      case 8: // Done
+        typeDescription = 'Vendor: New Order Request';
+        break;
+      case 9: // Done
+        typeDescription = 'Vendor: Offer Accepted';
+        break;
+      case 10:
+        typeDescription = 'Vendor: Order Status Change';
+        break;
+      case 11: // Done
+        typeDescription = 'Vendor: User Set Favourite';
+        break;
+      case 12: // Done
+        typeDescription = 'Vendor: User Rate Or Comment';
+        break;
+      case 13: // Done
+        typeDescription = 'Transporter: New Price Request';
+        break;
+      case 14:
+        typeDescription = 'Transporter: New Order Request';
         break;
     }
 
     let payload;
-    //1 ==> ios, 2 ==> android
-    if (deviceType == 1) {
+    
+    if (deviceType == "android") {
       //Set the data object
       payload = {
         data: {
           title,
           body,
-          type,
+          type: type.toString(),
           typeDescription,
+          data: JSON.stringify(data),
         },
       };
     } else {
       payload = {
         data: {
-          type,
+          type: type.toString(),
           typeDescription,
           ...data,
         },
@@ -63,10 +98,9 @@ module.exports = async ({
     let result = await admin.messaging().sendToDevice(firebaseToken, payload, options);
 
     if (result.results[0].error) {
-      console.log(`Firebase error,`, result.results[0].error);
+      throw new Error(result.results[0].error.message);
     }
   } catch (e) {
-
-    console.log(`Error in sendNotification, error: ${e.message}`);
+    throw new CustomError("FIREBASE_ADMIN_ERROR",e.message);
   }
 };

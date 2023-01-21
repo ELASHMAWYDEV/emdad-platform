@@ -89,6 +89,11 @@ const UserSchema = new Schema(
     firebaseToken: {
       type: String,
     },
+    deviceType: {
+      type: String,
+      enum: ["android", "ios"],
+      default: "android",
+    },
     country: {
       type: String,
       enum: Object.keys(countryCodes),

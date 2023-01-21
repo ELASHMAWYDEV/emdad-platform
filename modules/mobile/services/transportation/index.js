@@ -10,6 +10,7 @@ const CustomError = require("../../../../errors/CustomError");
 const { Types } = require("mongoose");
 const { listTransporters } = require("../user");
 const { WEBSITE_URL } = require("../../../../globals");
+const { sendNotification } = require("../../../../helpers");
 
 const listTransportationRequests = async ({
   _id = null,
@@ -62,6 +63,8 @@ const listTransportationRequests = async ({
               location: 1,
               oraganizationName: 1,
               logo: 1,
+              firebaseToken: 1,
+              deviveType: 1,
             },
           },
         ],
@@ -202,14 +205,22 @@ const sendTransportationRequest = async (transportationRequestId) => {
   // Get transportation full details
   const transportationRequest = await getTransportationRequestInfo(transportationRequestId);
 
-  // Get all transporters in the same city
+  // Get all transporters in the request cities
   const transporters = await listTransporters({
-    limit: 0,
-    city: transportationRequest.city,
+    city: { $in: transportationRequest.cities },
   });
 
-  // Send notification to all of them
-  // @TODO: send notification to all transporters with the transportation details
+  // send notification to all transporters with the transportation details
+  transporters.forEach((transporter) => {
+    sendNotification({
+      firebaseToken: transporter.firebaseToken,
+      deviceType: transporter.deviceType,
+      title: "طلب نقل جديد",
+      body: `لديك طلب نقل جديد من ${transportationRequest.requester.name}`,
+      type: 13,
+      data: transportationRequest,
+    });
+  });
 };
 
 const createTransportationOffer = validateSchema(schemas.createTransportationOfferSchema)(
@@ -229,7 +240,15 @@ const createTransportationOffer = validateSchema(schemas.createTransportationOff
     // Create the offer
     const createdOffer = await TransportationOfferModel.create(transportationOffer);
 
-    // @TODO: send notification to the requester to inform him of the new offer
+    // send notification to the requester to inform him of the new offer
+    sendNotification({
+      firebaseToken: transportationRequest.requester.firebaseToken,
+      deviceType: transportationRequest.requester.deviceType,
+      title: "عرض توصيل جديد",
+      body: "لقد تلقيت عرض توصيل جديد من شركة نقل",
+      type: 3,
+      data: createdOffer,
+    }).catch(console.log);
 
     const createdTransportationOffer = await getTransportationOfferInfo(createdOffer._id);
 

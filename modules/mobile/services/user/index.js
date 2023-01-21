@@ -9,6 +9,7 @@ const { errorCodes } = require("../../../../errors");
 const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas");
 const { Types } = require("mongoose");
+const { sendNotification } = require("../../../../helpers");
 const { WEBSITE_URL } = require("../../../../globals");
 
 const listTransporters = validateSchema(schemas.listTransportersSchema)(
@@ -228,6 +229,19 @@ const toggleVendorToFavourites = async ({ vendorId, userId }) => {
       }
     );
 
+  // Send notification to vendor
+  if (!!!isExist) {
+    const vendor = await UserModel.findById(vendorId);
+    const user = await UserModel.findById(userId);
+    sendNotification({
+      firebaseToken: vendor.firebaseToken,
+      deviceType: vendor.deviceType,
+      title: `تم اضافتك الي التجار المفضلين الخاصة بالمستخدم ${user.name}`,
+      body: `تم اضافتك الي التجار المفضلين الخاصة بالمستخدم ${user.name}`,
+      type: 11,
+    });
+  }
+
   return !!isExist ? "تم حذف البائع من المفضلة بنجاح" : "تم اضافة البائع الي المفضلة بنجاح";
 };
 
@@ -248,6 +262,18 @@ const rateTarget = validateSchema(schemas.rateTargetSchema)(async ({ targetId, u
       new: true,
     }
   );
+
+  // Send notification to vendor
+  const vendor = await UserModel.findById(targetId);
+  const user = await UserModel.findById(userId);
+  sendNotification({
+    firebaseToken: vendor.firebaseToken,
+    deviceType: vendor.deviceType,
+    title: `تم تقييمك بنجاح`,
+    body: `قام المستخدم ${user.name} بتقييمك بنجاح`,
+    type: 12,
+    data: ratingResult,
+  });
 
   return ratingResult;
 });
