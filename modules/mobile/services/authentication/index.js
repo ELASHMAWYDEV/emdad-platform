@@ -111,11 +111,11 @@ const sendOtp = async (userId, type) => {
   }
 
   if (phoneOtp) {
-    // await twilioClient.messages.create({
-    //   body: `Your OTP is: ${phoneOtp}`,
-    //   messagingServiceSid: TWILIO_SERVICE_ID,
-    //   to: `${primaryPhoneNumber.countryCode}${primaryPhoneNumber.number.slice(1)}`,
-    // });
+    await twilioClient.messages.create({
+      body: `Your OTP is: ${phoneOtp}`,
+      messagingServiceSid: TWILIO_SERVICE_ID,
+      to: `${primaryPhoneNumber.countryCode}${primaryPhoneNumber.number.slice(1)}`,
+    });
 
     if (type == "phone") return { phoneOtp };
   }

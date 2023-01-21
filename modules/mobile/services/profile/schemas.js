@@ -65,6 +65,7 @@ module.exports = {
       _id: {
         type: "object",
       },
+      name: { type: "string" },
       logo: { type: "string", nullable: true },
       vendorType: {
         type: "array",
