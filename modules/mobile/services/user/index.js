@@ -31,6 +31,7 @@ const listTransporters = validateSchema(schemas.listTransportersSchema)(
       ...(searchQuery && {
         oraganizationName: {
           $regex: ".*" + searchQuery + ".*",
+          $options: "i"
         },
       }),
       ...(transportationMethods && {
@@ -77,6 +78,7 @@ const listVendors = validateSchema(schemas.listVendorsSchema)(
       ...(searchQuery && {
         oraganizationName: {
           $regex: ".*" + searchQuery + ".*",
+          $options: "i"
         },
       }),
       ...(vendorType.length !== 0 && {

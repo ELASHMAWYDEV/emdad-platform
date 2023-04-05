@@ -51,7 +51,10 @@ const listProducts = async ({
     ...(productType.length !== 0 && { productType: { $in: productType } }),
     vendorId: ObjectId(vendorId),
     ...(searchQuery && {
-      $or: [{ name: { $regex: ".*" + searchQuery + ".*" } }, { description: { $regex: ".*" + searchQuery + ".*" } }],
+      $or: [
+        { name: { $regex: ".*" + searchQuery + ".*", $options: "i" } },
+        { description: { $regex: ".*" + searchQuery + ".*", $options: "i" } },
+      ],
     }),
   })
     .limit(Number(limit))
