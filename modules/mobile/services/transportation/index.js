@@ -45,6 +45,11 @@ const listTransportationRequests = async ({
       },
     },
     {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+    {
       $limit: Number(limit),
     },
     {
@@ -280,6 +285,11 @@ const listTransportationOffers = async ({
         ...(transportationRequestId && {
           transportationRequestId: new Types.ObjectId(transportationRequestId),
         }),
+      },
+    },
+    {
+      $sort: {
+        createdAt: -1,
       },
     },
     {

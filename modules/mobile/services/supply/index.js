@@ -25,6 +25,7 @@ const listSupplyRequests = async ({
     ...(vendorId && { vendorId }),
     ...(requestStatus && { requestStatus: { $in: [].concat(requestStatus) } }),
   })
+    .sort({ createdAt: -1 })
     .limit(parseInt(limit.toString()))
     .populate("user vendor transportationRequest")
     .lean({ virtuals: true });
