@@ -18,6 +18,8 @@ const errorCodes = Object.freeze({
   PASSWORD_NOT_CORRECT: "PASSWORD_NOT_CORRECT",
   EMAIL_NOT_CORRECT: "EMAIL_NOT_CORRECT",
   EMAIL_DID_NOT_CHANGE: "EMAIL_DID_NOT_CHANGE",
+  PHONE_NUMBER_NOT_CORRECT: "PHONE_NUMBER_NOT_CORRECT",
+  PHONE_NUMBER_DID_NOT_CHANGE: "PHONE_NUMBER_DID_NOT_CHANGE",
   NO_SUPPLIERS_FOUND: "NO_SUPPLIERS_FOUND",
   NO_SETTINGS_FOUND: "NO_SETTINGS_FOUND",
   PRODUCT_NOT_FOUND: "PRODUCT_NOT_FOUND",
@@ -85,6 +87,14 @@ const errors = Object.freeze({
   [errorCodes.EMAIL_DID_NOT_CHANGE]: {
     status: statuses.OK,
     message: "لم تقم بعمل أي تغيير علي البريد الالكتروني القديم",
+  },
+  [errorCodes.PHONE_NUMBER_NOT_CORRECT]: {
+    status: statuses.OK,
+    message: "رقم الهاتف الذي ادخلته غير صحيح",
+  },
+  [errorCodes.PHONE_NUMBER_DID_NOT_CHANGE]: {
+    status: statuses.OK,
+    message: "لم تقم بعمل أي تغيير علي رقم الهاتف القديم",
   },
   [errorCodes.NO_SUPPLIERS_FOUND]: {
     status: statuses.OK,

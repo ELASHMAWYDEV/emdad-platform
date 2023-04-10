@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const _ = require("lodash");
 const ApiError = require("../../../../errors/ApiError");
 const { errorCodes } = require("../../../../errors");
 const UserModel = require("../../../../models/User");
@@ -118,10 +119,38 @@ const editUserEmail = validateSchema(schemas.editEmailSchema)(async ({ _id, oldE
   return userAfterUpdate;
 });
 
+const editUserPhoneNumber = validateSchema(schemas.editPhoneNumberSchema)(
+  async ({ _id, oldPhoneNumber, newPhoneNumber, password }) => {
+    let userObject = await UserModel.findById(_id);
+
+    // Password Match
+    if (!(await bcrypt.compare(password, userObject.password))) throw new ApiError(errorCodes.PASSWORD_NOT_CORRECT);
+
+    // Email validation
+    if (!_.isEqual(oldPhoneNumber, userObject.primaryPhoneNumber))
+      throw new ApiError(errorCodes.PHONE_NUMBER_NOT_CORRECT);
+    if (_.isEqual(newPhoneNumber, userObject.primaryPhoneNumber))
+      throw new ApiError(errorCodes.PHONE_NUMBER_DID_NOT_CHANGE);
+
+    const userAfterUpdate = await UserModel.findOneAndUpdate(
+      {
+        _id,
+      },
+      {
+        primaryPhoneNumber: newPhoneNumber,
+      },
+      { new: true }
+    ).lean({ virtuals: true });
+
+    return userAfterUpdate;
+  }
+);
+
 module.exports = {
   getUserProfile,
   completeUserProfile,
   editUserProfile,
   editUserPassword,
   editUserEmail,
+  editUserPhoneNumber,
 };

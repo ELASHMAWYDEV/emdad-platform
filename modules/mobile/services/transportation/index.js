@@ -66,8 +66,15 @@ const listTransportationRequests = async ({
               country: 1,
               city: 1,
               location: 1,
+              locationObject: {
+                lat: { $arrayElemAt: ["$location.coordinates", 1] },
+                lng: { $arrayElemAt: ["$location.coordinates", 0] },
+              },
               oraganizationName: 1,
               logo: 1,
+              logoUrl: {
+                $concat: [`${WEBSITE_URL}/images/users/`, "$logo"],
+              },
               firebaseToken: 1,
               deviveType: 1,
             },
@@ -104,8 +111,15 @@ const listTransportationRequests = async ({
               country: 1,
               city: 1,
               location: 1,
+              locationObject: {
+                lat: { $arrayElemAt: ["$location.coordinates", 1] },
+                lng: { $arrayElemAt: ["$location.coordinates", 0] },
+              },
               oraganizationName: 1,
               logo: 1,
+              logoUrl: {
+                $concat: [`${WEBSITE_URL}/images/users/`, "$logo"],
+              },
             },
           },
         ],
@@ -128,8 +142,15 @@ const listTransportationRequests = async ({
               country: 1,
               city: 1,
               location: 1,
+              locationObject: {
+                lat: { $arrayElemAt: ["$location.coordinates", 1] },
+                lng: { $arrayElemAt: ["$location.coordinates", 0] },
+              },
               oraganizationName: 1,
               logo: 1,
+              logoUrl: {
+                $concat: [`${WEBSITE_URL}/images/users/`, "$logo"],
+              },
             },
           },
         ],

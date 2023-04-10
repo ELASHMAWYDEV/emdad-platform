@@ -31,6 +31,7 @@ router.post("/profile/complete", checkToken, profileController.completeProfile);
 router.post("/profile/edit", checkToken, profileController.editProfile);
 router.post("/profile/password", checkToken, profileController.editPassword);
 router.post("/profile/email", checkToken, profileController.editEmail);
+router.post("/profile/phoneNumber", checkToken, profileController.editPhoneNumber);
 
 //User
 router.get("/user/home", checkToken, guestMiddleware, userMiddleware, userController.getHomeData);

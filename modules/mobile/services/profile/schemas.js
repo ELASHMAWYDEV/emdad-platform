@@ -149,4 +149,40 @@ module.exports = {
       },
     },
   },
+  editPhoneNumberSchema: {
+    type: "object",
+    required: ["_id", "oldPhoneNumber", "newPhoneNumber", "password"],
+    properties: {
+      _id: {
+        type: "object",
+      },
+      oldPhoneNumber: {
+        type: "object",
+        properties: {
+          countryCode: {
+            type: "string",
+            enum: Object.values(countryCodes),
+          },
+          number: {
+            type: "string",
+          },
+        },
+      },
+      newPhoneNumber: {
+        type: "object",
+        properties: {
+          countryCode: {
+            type: "string",
+            enum: Object.values(countryCodes),
+          },
+          number: {
+            type: "string",
+          },
+        },
+      },
+      password: {
+        type: "string",
+      },
+    },
+  },
 };

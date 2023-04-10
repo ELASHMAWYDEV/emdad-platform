@@ -63,6 +63,27 @@ TransportationRequestSchema.virtual("transportationRequest", {
   },
 });
 
+TransportationRequestSchema.virtual("user", {
+  ref: "User",
+  localField: "userId",
+  foreignField: "_id",
+  justOne: true,
+  options: {
+    select: "_id name city country oraganizationName logo location firebaseToken deviceType",
+  },
+});
+
+TransportationRequestSchema.virtual("vendor", {
+  ref: "User",
+  localField: "vendorId",
+  foreignField: "_id",
+  justOne: true,
+  options: {
+    select: "_id name city country oraganizationName logo location firebaseToken deviceType",
+  },
+});
+
+
 TransportationRequestSchema.plugin(mongooseLeanVirtuals);
 
 module.exports = model("TransportationRequest", TransportationRequestSchema, "transportationRequests");

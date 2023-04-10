@@ -88,10 +88,31 @@ const editEmail = async (req, res, next) => {
   }
 };
 
+const editPhoneNumber = async (req, res, next) => {
+  try {
+    const { oldPhoneNumber, newPhoneNumber, password } = req.body;
+    const userAfterUpdate = await ProfileService.editUserPhoneNumber({
+      oldPhoneNumber,
+      newPhoneNumber,
+      password,
+      _id: req.user._id,
+    });
+
+    return res.json({
+      status: true,
+      message: "تم تعديل رقم الهاتف الاساسي بنجاح",
+      data: { user: userAfterUpdate },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   getUserProfile,
   completeProfile,
   editProfile,
   editPassword,
   editEmail,
+  editPhoneNumber,
 };
