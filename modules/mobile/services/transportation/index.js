@@ -188,10 +188,11 @@ const createTransportationRequest = validateSchema(schemas.createTransportationR
       throw new CustomError("REQUESTER_NOT_RECOGNIZED", "ليس لك حق عمل طلب نقل لعرض السعر هذا");
     }
 
+    //@TODO: remove commenting
     // User must pay for the vendor first (if he want to send transportation request)
-    if (transportationRequest.requesterType == userTypes.USER && supplyRequest.paymentStatus != paymentStatus.PAID) {
-      throw new CustomError("SUPPLY_REQUET_UNPAID", "يجب دفع عرض السعر أولا");
-    }
+    // if (transportationRequest.requesterType == userTypes.USER && supplyRequest.paymentStatus != paymentStatus.PAID) {
+    //   throw new CustomError("SUPPLY_REQUEST_UNPAID", "يجب دفع عرض السعر أولا");
+    // }
 
     // Validate already made transportation request
     if (supplyRequest.transportationRequestId) {
