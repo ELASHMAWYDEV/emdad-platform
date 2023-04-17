@@ -31,7 +31,7 @@ const listTransporters = validateSchema(schemas.listTransportersSchema)(
       ...(searchQuery && {
         oraganizationName: {
           $regex: ".*" + searchQuery + ".*",
-          $options: "i"
+          $options: "i",
         },
       }),
       ...(transportationMethods && {
@@ -78,7 +78,7 @@ const listVendors = validateSchema(schemas.listVendorsSchema)(
       ...(searchQuery && {
         oraganizationName: {
           $regex: ".*" + searchQuery + ".*",
-          $options: "i"
+          $options: "i",
         },
       }),
       ...(vendorType.length !== 0 && {
@@ -236,8 +236,7 @@ const toggleVendorToFavourites = async ({ vendorId, userId }) => {
     const vendor = await UserModel.findById(vendorId);
     const user = await UserModel.findById(userId);
     sendNotification({
-      firebaseToken: vendor.firebaseToken,
-      deviceType: vendor.deviceType,
+      userId: vendor._id,
       title: `تم اضافتك الي التجار المفضلين الخاصة بالمستخدم ${user.name}`,
       body: `تم اضافتك الي التجار المفضلين الخاصة بالمستخدم ${user.name}`,
       type: 11,
@@ -269,8 +268,7 @@ const rateTarget = validateSchema(schemas.rateTargetSchema)(async ({ targetId, u
   const vendor = await UserModel.findById(targetId);
   const user = await UserModel.findById(userId);
   sendNotification({
-    firebaseToken: vendor.firebaseToken,
-    deviceType: vendor.deviceType,
+    userId: vendor._id,
     title: `تم تقييمك بنجاح`,
     body: `قام المستخدم ${user.name} بتقييمك بنجاح`,
     type: 12,

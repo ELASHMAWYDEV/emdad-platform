@@ -1,7 +1,7 @@
 const SettingsService = require("../../services/settings");
 const FileService = require("../../services/file");
 
-const liseSettings = async (req, res, next) => {
+const listSettings = async (req, res, next) => {
   try {
     const result = await SettingsService.getMobileSettings();
 
@@ -30,7 +30,26 @@ const uploadImages = async (req, res, next) => {
   }
 };
 
+const listNotifications = async (req, res, next) => {
+  try {
+    const filters = req.query;
+    const { userId } = req.user;
+
+    const result = await SettingsService.listNotifications({ userId, ...filters });
+
+    return res.json({
+      status: true,
+      data: {
+        notifications: result || [],
+      },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
-  liseSettings,
+  listSettings,
   uploadImages,
+  listNotifications,
 };

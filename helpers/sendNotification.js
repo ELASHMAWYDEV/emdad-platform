@@ -1,69 +1,69 @@
-const admin = require('firebase-admin');
-const CustomError = require('../errors/CustomError');
+const admin = require("firebase-admin");
+const CustomError = require("../errors/CustomError");
+const User = require("../models/User");
+const Notification = require("../models/Notification");
 
-module.exports = async ({
-  firebaseToken,
-  title,
-  body,
-  type,
-  deviceType,
-  data = {}
-}) => {
+module.exports = async ({ userId, title, body, type, data = {} }) => {
   try {
-    if (!firebaseToken) {
-      console.log('Firbase token is missing');
-      return;
+    const userSearch = await User.findById(userId);
+
+    if (!userSearch) {
+      throw new CustomError("USER_NOT_FOUND_IN_NOTIFICATION", "لم يتم العثور على المستخدم");
     }
 
-    let typeDescription = '';
+    if (!userSearch.firebaseToken) {
+      throw new CustomError("FIREBASE_TOKEN_NOT_FOUND", "لم يتم العثور على مفتاح الإشعارات");
+    }
+
+    let typeDescription = "";
     switch (type) {
       case 1:
-        typeDescription = 'Dashboard Notification';
+        typeDescription = "Dashboard Notification";
         break;
       case 2: // Done
-        typeDescription = 'User: Supply Offer';
+        typeDescription = "User: Supply Offer";
         break;
       case 3: // Done
-        typeDescription = 'User: Transportation Offer';
+        typeDescription = "User: Transportation Offer";
         break;
       case 4:
-        typeDescription = 'User: Order Status Change';
+        typeDescription = "User: Order Status Change";
         break;
       case 5:
-        typeDescription = 'User: New Vendor Created';
+        typeDescription = "User: New Vendor Created";
         break;
       case 6:
-        typeDescription = 'User: Favourite Vendor Added New Product';
+        typeDescription = "User: Favourite Vendor Added New Product";
         break;
       case 7: // Done
-        typeDescription = 'Vendor: New Price Request';
+        typeDescription = "Vendor: New Price Request";
         break;
       case 8: // Done
-        typeDescription = 'Vendor: New Order Request';
+        typeDescription = "Vendor: New Order Request";
         break;
       case 9: // Done
-        typeDescription = 'Vendor: Offer Accepted';
+        typeDescription = "Vendor: Offer Accepted";
         break;
       case 10:
-        typeDescription = 'Vendor: Order Status Change';
+        typeDescription = "Vendor: Order Status Change";
         break;
       case 11: // Done
-        typeDescription = 'Vendor: User Set Favourite';
+        typeDescription = "Vendor: User Set Favourite";
         break;
       case 12: // Done
-        typeDescription = 'Vendor: User Rate Or Comment';
+        typeDescription = "Vendor: User Rate Or Comment";
         break;
       case 13: // Done
-        typeDescription = 'Transporter: New Price Request';
+        typeDescription = "Transporter: New Price Request";
         break;
       case 14:
-        typeDescription = 'Transporter: New Order Request';
+        typeDescription = "Transporter: New Order Request";
         break;
     }
 
     let payload;
-    
-    if (deviceType == "android") {
+
+    if (userSearch.deviceType == "android") {
       //Set the data object
       payload = {
         data: {
@@ -84,23 +84,32 @@ module.exports = async ({
         notification: {
           body,
           title,
-          click_action: 'MainActivity',
-          android_channel_id: 'notification_channel_id',
+          click_action: "MainActivity",
+          android_channel_id: "notification_channel_id",
         },
       };
     }
 
     let options = {
-      priority: 'high',
+      priority: "high",
       timeToLive: 60 * 60 * 24,
     };
 
-    let result = await admin.messaging().sendToDevice(firebaseToken, payload, options);
+    let result = await admin.messaging().sendToDevice(userSearch.firebaseToken, payload, options);
 
     if (result.results[0].error) {
       throw new Error(result.results[0].error.message);
     }
+
+    // Save the notification to the database
+    await Notification.create({
+      userId,
+      title,
+      body,
+      type,
+      data,
+    });
   } catch (e) {
-    throw new CustomError("FIREBASE_ADMIN_ERROR",e.message);
+    throw new CustomError("NOTIFICATION_ERROR", e.message);
   }
 };

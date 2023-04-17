@@ -191,7 +191,8 @@ router.put(
 );
 
 //Global
-router.get("/settings", settingsController.liseSettings);
+router.get("/settings", settingsController.listSettings);
 router.post("/images", settingsController.uploadImages);
+router.get("/notifications", checkToken, settingsController.listNotifications);
 
 module.exports = router;
