@@ -268,7 +268,7 @@ const createTransportationOffer = validateSchema(schemas.createTransportationOff
 
     // send notification to the requester to inform him of the new offer
     sendNotification({
-      userId: requester._id,
+      userId: createdOffer.transporter._id,
       title: "عرض توصيل جديد",
       body: "لقد تلقيت عرض توصيل جديد من شركة نقل",
       type: 3,

@@ -65,7 +65,7 @@ const createSupplyRequest = validateSchema(schemas.createSupplyRequestSchema)(as
   const createdSupplyRequest = await getSupplyRequestInfo(result._id);
   // Send notification to the vendor
   sendNotification({
-    userId: vendor._id,
+    userId: createdSupplyRequest.vendor._id,
     title: "تم انشاء طلب عرض سعر جديد",
     body: `تم انشاء طلب عرض سعر جديد من قبل ${createdSupplyRequest.user.name}`,
     type: 8,
@@ -99,7 +99,7 @@ const resendSupplyRequest = validateSchema(schemas.resendSupplyRequestSchema)(as
   const updatedSupplyRequest = await getSupplyRequestInfo(supplyRequest.supplyRequestId);
   // send notification to the vendor
   sendNotification({
-    userId: vendor._id,
+    userId: updatedSupplyRequest.vendor._id,
     title: "تم استلام طلب عرض سعر جديد",
     body: `تم استلام طلب عرض سعر جديد من قبل ${updatedSupplyRequest.user.name}`,
     type: 7,
@@ -190,7 +190,7 @@ const quoteSupplyRequest = validateSchema(schemas.quoteSupplyRequestSchema)(
 
     // send notification to the user
     sendNotification({
-      userId: user._id,
+      userId: updatedSupplyRequest.user._id,
       title: "تم استلام عرض سعر جديد",
       body: `تم استلام عرض سعر جديد من قبل ${updatedSupplyRequest.vendor.name}`,
       type: 2,
@@ -224,7 +224,7 @@ const acceptSupplyRequest = async (supplyRequestId) => {
 
   // send notification to the vendor
   sendNotification({
-    userId: vendor._id,
+    userId: updatedSupplyRequest.vendor._id,
     title: "تم الموافقة علي عرض سعرك",
     body: `تم الموافقة علي عرض سعرك من قبل ${updatedSupplyRequest.user.name}`,
     type: 9,
