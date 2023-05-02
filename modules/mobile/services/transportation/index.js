@@ -5,7 +5,13 @@ const UserModel = require("../../../../models/User");
 const SupplyRequestModel = require("../../../../models/SupplyRequest");
 const schemas = require("./schemas");
 const supplyService = require("../supply");
-const { userTypes, paymentStatus, transportationStatus, ObjectId } = require("../../../../models/constants");
+const {
+  userTypes,
+  paymentStatus,
+  transportationStatus,
+  ObjectId,
+  supplyRequestStatus,
+} = require("../../../../models/constants");
 const CustomError = require("../../../../errors/CustomError");
 const { Types } = require("mongoose");
 const { listTransporters } = require("../user");
@@ -416,6 +422,19 @@ const changeTransporationRequestStatus = async ({ transportationRequestId, statu
 
   // Update the transportation request status
   await TransportationRequestModel.updateOne({ _id: transportationRequestId }, { transportationStatus: status });
+
+  // Change supply request status accordingly
+  if (status === transportationStatus.DELIVERED) {
+    await supplyService.changeSupplyRequestStatus({
+      supplyRequestId: transportationRequest.supplyRequestId,
+      status: supplyRequestStatus.DELIVERED,
+    });
+  } else if ([transportationStatus.PICKUP_LOCATION, transportationStatus.DELIVERY_LOCATIONN].includes(status)) {
+    await supplyService.changeSupplyRequestStatus({
+      supplyRequestId: transportationRequest.supplyRequestId,
+      status: supplyRequestStatus.ON_WAY,
+    });
+  }
 
   // Send notification to the transporter
   sendNotification({

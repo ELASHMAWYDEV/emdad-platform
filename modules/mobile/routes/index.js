@@ -130,6 +130,12 @@ router.get(
   vendorMiddleware,
   vendorController.getSupplyRequestInfo
 );
+router.post(
+  "/vendor/supplyRequests/:supplyRequestId/changeStatus",
+  checkToken,
+  vendorMiddleware,
+  vendorController.changeSupplyRequestStatus
+);
 
 router.put(
   "/vendor/transportationRequests",

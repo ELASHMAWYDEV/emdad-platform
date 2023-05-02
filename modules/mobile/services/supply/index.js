@@ -5,6 +5,7 @@ const { validateSchema } = require("../../../../middlewares/schema");
 const schemas = require("./schemas");
 const CustomError = require("../../../../errors/CustomError");
 const sendNotification = require("../../../../helpers/sendNotification");
+const transportationService = require("../transportation");
 
 const listSupplyRequests = async ({
   userId = null,
@@ -233,6 +234,65 @@ const acceptSupplyRequest = async (supplyRequestId) => {
   return updatedSupplyRequest;
 };
 
+const changeSupplyRequestStatus = async ({ supplyRequestId, status }) => {
+  // Status should be one of [AWAITING_TRANSPORTAION, ON_WAY, DELIVERED]
+  if (
+    ![supplyRequestStatus.AWAITING_TRANSPORTAION, supplyRequestStatus.ON_WAY, supplyRequestStatus.DELIVERED].includes(
+      status
+    )
+  ) {
+    throw new CustomError("STATUS_NOT_CORRECT", "لا يمكنك تغيير حالة الطلب");
+  }
+
+  const supplyRequest = await getSupplyRequestInfo(supplyRequestId);
+  const transportationRequestSearch = await transportationService.getTransportationRequestInfo(
+    supplyRequest.transportationRequestId
+  );
+
+  // if ON_WAY then transportation reequest should be one of [PICKUP_LOCATION, DELIVERY_LOCATION]
+  if (status == supplyRequestStatus.ON_WAY) {
+    if (
+      ![supplyRequestStatus.PICKUP_LOCATION, supplyRequestStatus.DELIVERY_LOCATION].includes(
+        transportationRequestSearch.transportationStatus
+      )
+    ) {
+      throw new CustomError("STATUS_NOT_CORRECT", "لا يمكنك تغيير حالة الطلب الي قيد التوصيل لأن التوصيل لم يبدأ بعد");
+    }
+  }
+
+  // if DELIVERED then transportation request should equal DELIVERED
+  if (status == supplyRequestStatus.DELIVERED) {
+    if (transportationRequestSearch.transportationStatus != supplyRequestStatus.DELIVERED) {
+      throw new CustomError("STATUS_NOT_CORRECT", "لا يمكنك تغيير حالة الطلب الي تم التوصيل لأن التوصيل لم ينتهي بعد");
+    }
+  }
+
+  // Update the supply request
+  await SupplyRequestModel.updateOne(
+    { _id: supplyRequestId },
+    {
+      $set: {
+        requestStatus: status,
+        [`statusChangeLog.${status}`]: new Date(),
+      },
+    }
+  );
+
+  // Get the supply request after update
+  const updatedSupplyRequest = await getSupplyRequestInfo(supplyRequestId);
+
+  // send notification to the user
+  sendNotification({
+    userId: updatedSupplyRequest.user._id,
+    title: "تم تغيير حالة الطلب",
+    body: `تم تغيير حالة الطلب الي ${status}`,
+    type: 2,
+    data: updatedSupplyRequest,
+  }).catch(console.log);
+
+  return updatedSupplyRequest;
+};
+
 module.exports = {
   createSupplyRequest,
   resendSupplyRequest,
@@ -240,4 +300,5 @@ module.exports = {
   listSupplyRequests,
   getSupplyRequestInfo,
   acceptSupplyRequest,
+  changeSupplyRequestStatus,
 };

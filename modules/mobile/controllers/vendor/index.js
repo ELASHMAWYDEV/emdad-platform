@@ -185,6 +185,25 @@ const getTransportationOfferInfo = async (req, res, next) => {
   }
 };
 
+const changeSupplyRequestStatus = async (req, res, next) => {
+  try {
+    const { supplyRequestId } = req.params;
+    const { status } = req.body;
+    const result = await SupplyService.changeSupplyRequestStatus({
+      supplyRequestId,
+      status,
+    });
+
+    return res.json({
+      status: true,
+      message: "تم تغيير حالة الطلب بنجاح",
+      data: { supplyRequest: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   addProduct,
   editProduct,
@@ -197,4 +216,5 @@ module.exports = {
   listTransportationOffers,
   acceptTransportationOffer,
   getTransportationOfferInfo,
+  changeSupplyRequestStatus
 };
