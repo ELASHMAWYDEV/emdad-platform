@@ -155,6 +155,12 @@ router.get(
   vendorMiddleware,
   vendorController.getTransportationOfferInfo
 );
+router.post(
+  "/vendor/transportationRequests/:transportationRequestId/changeStatus",
+  checkToken,
+  vendorMiddleware,
+  transporterController.changeTransportationRequestStatus
+);
 // router.post("/vendor/transportationOffers/:transportationOfferId/pay", checkToken, vendorMiddleware, tempResponse);
 // router.get("/vendor/transportationOffers/paymentStatus/success", checkToken, vendorMiddleware, tempResponse);
 // router.get("/vendor/transportationOffers/paymentStatus/failure", checkToken, vendorMiddleware, tempResponse);
