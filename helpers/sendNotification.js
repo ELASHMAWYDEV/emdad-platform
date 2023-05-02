@@ -59,6 +59,9 @@ module.exports = async ({ userId, title, body, type, data = {} }) => {
       case 14:
         typeDescription = "Transporter: New Order Request";
         break;
+      case 15:
+        typeDescription = "Transporter: Transporation Request Status Changed";
+        break;
     }
 
     let payload;

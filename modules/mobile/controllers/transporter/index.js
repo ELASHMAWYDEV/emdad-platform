@@ -73,9 +73,30 @@ const createTransportationOffer = async (req, res, next) => {
   }
 };
 
+const changeTransportationRequestStatus = async (req, res, next) => {
+  try {
+    const { transportationRequestId } = req.params;
+    const { status } = req.body;
+    const result = await TransportationService.changeTransporationRequestStatus({
+      transportationRequestId,
+      status,
+      transporterId: req.user._id,
+    });
+
+    return res.json({
+      status: true,
+      message: "تم تغيير حالة التوصيل بنجاح",
+      data: { transportationRequest: result },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   listTransportationRequests,
   getTransportationRequestDetails,
   listAcceptedTransportationRequests,
   createTransportationOffer,
+  changeTransportationRequestStatus,
 };

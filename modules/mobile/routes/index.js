@@ -101,14 +101,20 @@ router.get(
   userController.getTransportationOfferInfo
 );
 // router.get("/user/transportationRequests", checkToken, userMiddleware, tempResponse);
-router.get("/user/transportationRequests/:transportationRequestId", checkToken, userMiddleware, tempResponse);
-router.post("/user/transportationRequests/:transportationRequestId/resend", checkToken, userMiddleware, tempResponse);
+router.get("/user/transportationRequests/:transportationRequestId", checkToken, userMiddleware, transporterController.getTransportationRequestDetails);
+// router.post("/user/transportationRequests/:transportationRequestId/resend", checkToken, userMiddleware, tempResponse);
+router.post(
+  "/user/transportationRequests/:transportationRequestId/changeStatus",
+  checkToken,
+  userMiddleware,
+  transporterController.changeTransportationRequestStatus
+);
 
-router.get("/user/transportationOffers", checkToken, userMiddleware, tempResponse);
-router.get("/user/transportationOffers/:transportationOfferId", checkToken, userMiddleware, tempResponse);
-router.post("/user/transportationOffers/:transportationOfferId/pay", checkToken, userMiddleware, tempResponse);
-router.get("/user/transportationOffers/paymentStatus/success", checkToken, userMiddleware, tempResponse);
-router.get("/user/transportationOffers/paymentStatus/failure", checkToken, userMiddleware, tempResponse);
+// router.get("/user/transportationOffers", checkToken, userMiddleware, tempResponse);
+// router.get("/user/transportationOffers/:transportationOfferId", checkToken, userMiddleware, tempResponse);
+// router.post("/user/transportationOffers/:transportationOfferId/pay", checkToken, userMiddleware, tempResponse);
+// router.get("/user/transportationOffers/paymentStatus/success", checkToken, userMiddleware, tempResponse);
+// router.get("/user/transportationOffers/paymentStatus/failure", checkToken, userMiddleware, tempResponse);
 
 //Vendor
 router.post(
@@ -149,9 +155,9 @@ router.get(
   vendorMiddleware,
   vendorController.getTransportationOfferInfo
 );
-router.post("/vendor/transportationOffers/:transportationOfferId/pay", checkToken, vendorMiddleware, tempResponse);
-router.get("/vendor/transportationOffers/paymentStatus/success", checkToken, vendorMiddleware, tempResponse);
-router.get("/vendor/transportationOffers/paymentStatus/failure", checkToken, vendorMiddleware, tempResponse);
+// router.post("/vendor/transportationOffers/:transportationOfferId/pay", checkToken, vendorMiddleware, tempResponse);
+// router.get("/vendor/transportationOffers/paymentStatus/success", checkToken, vendorMiddleware, tempResponse);
+// router.get("/vendor/transportationOffers/paymentStatus/failure", checkToken, vendorMiddleware, tempResponse);
 
 router.put("/vendor/products", checkToken, vendorMiddleware, vendorController.addProduct);
 router.get("/vendor/products", checkToken, vendorMiddleware, vendorController.listProducts);
@@ -181,7 +187,7 @@ router.post(
   "/transporter/transportationRequests/:transportationRequestId/changeStatus",
   checkToken,
   transporterMiddleware,
-  tempResponse
+  transporterController.changeTransportationRequestStatus
 );
 router.put(
   "/transporter/transportationOffers",

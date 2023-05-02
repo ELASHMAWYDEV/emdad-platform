@@ -70,6 +70,7 @@ app.use((err, req, res, next) => {
       ])
     );
   } else {
+    console.log(err);
     return sendErrorResponse(res, new ApiError(errorCodes.UNKOWN_ERROR, err.message));
   }
 });

@@ -5,7 +5,7 @@ const UserModel = require("../../../../models/User");
 const SupplyRequestModel = require("../../../../models/SupplyRequest");
 const schemas = require("./schemas");
 const supplyService = require("../supply");
-const { userTypes, paymentStatus } = require("../../../../models/constants");
+const { userTypes, paymentStatus, transportationStatus, ObjectId } = require("../../../../models/constants");
 const CustomError = require("../../../../errors/CustomError");
 const { Types } = require("mongoose");
 const { listTransporters } = require("../user");
@@ -25,7 +25,7 @@ const listTransportationRequests = async ({
     {
       $match: {
         ...(_id && {
-          _id: new Types.ObjectId(_id),
+          _id: ObjectId(_id),
         }),
         ...(paginationToken && {
           _id: {
@@ -40,7 +40,7 @@ const listTransportationRequests = async ({
         }),
         ...(transportationStatus && { transportationStatus }),
         ...(transporterId && {
-          "transportationOffer.transporterId": new Types.ObjectId(transporterId),
+          "transportationOffer.transporterId": ObjectId(transporterId),
         }),
       },
     },
@@ -292,7 +292,7 @@ const listTransportationOffers = async ({
     {
       $match: {
         ...(_id && {
-          _id: new Types.ObjectId(_id),
+          _id: ObjectId(_id),
         }),
         ...(paginationToken && {
           _id: {
@@ -387,6 +387,60 @@ const acceptTransportationOffer = async (transportationOfferId) => {
   );
 };
 
+const changeTransporationRequestStatus = async ({ transportationRequestId, status }) => {
+  // Check if the status is valid
+  if (!Object.values(transportationStatus).includes(status)) {
+    throw new CustomError("INVALID_STATUS", "الحالة المرسلة غير صالحة");
+  }
+
+  // Get the transportation request
+  let transportationRequest = await getTransportationRequestInfo(transportationRequestId);
+
+  // Check if the status is the same as the current status
+  if (transportationRequest?.transportationStatus === status) {
+    throw new CustomError("SAME_STATUS", "الحالة المرسلة هي نفس الحالة الحالية");
+  }
+
+  // Check if the status is valid with a transportation offer
+  if (status !== transportationStatus.AWAITING_OFFERS && !transportationRequest.transportationOffer) {
+    throw new CustomError("NO_TRANSPORTATION_OFFER", "لا يوجد عرض توصيل مقبول");
+  }
+
+  // Check if status is valid with gradual status
+  if (
+    Object.values(transportationStatus).indexOf(status) <=
+    Object.values(transportationStatus).indexOf(transportationRequest.transportationStatus)
+  ) {
+    throw new CustomError("INVALID_STATUS_ORDER", "ترتيب الحالة المرسلة غير صحيح");
+  }
+
+  // Update the transportation request status
+  await TransportationRequestModel.updateOne({ _id: transportationRequestId }, { transportationStatus: status });
+
+  // Send notification to the transporter
+  sendNotification({
+    userId: transportationRequest.transportationOffer.transporterId,
+    title: "تغيير حالة الطلب",
+    body: "تم تغيير حالة الطلب الخاص بك",
+    type: 15,
+    data: transportationRequest,
+  }).catch(console.log);
+
+  // Send notification to the requester
+  sendNotification({
+    userId: transportationRequest.requesterId,
+    title: "تغيير حالة التوصيل للطلب الخاص بك",
+    body: "تم تغيير حالة التوصيل الخاص بك",
+    type: 15,
+    data: transportationRequest,
+  }).catch(console.log);
+
+  // Get the transportation request again
+  transportationRequest = await getTransportationRequestInfo(transportationRequestId);
+
+  return transportationRequest;
+};
+
 module.exports = {
   listTransportationRequests,
   getTransportationRequestInfo,
@@ -396,4 +450,5 @@ module.exports = {
   listTransportationOffers,
   getTransportationOfferInfo,
   acceptTransportationOffer,
+  changeTransporationRequestStatus,
 };
